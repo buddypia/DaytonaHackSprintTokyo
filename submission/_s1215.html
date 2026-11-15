@@ -1,0 +1,284 @@
+<!-- ============================ 12 SPONSORS ============================ -->
+<section class="slide dark">
+  <div class="eyebrow"><span class="n">12</span><span>Sponsor integration</span></div>
+  <h2>Daytona isn’t a wrapper here.<br>It’s <em>the machine that does the work.</em></h2>
+  <div class="ja" style="color:#98A2B2">Daytona は実行基盤そのもの。Nosana は個人情報を外に出さない推論基盤です。</div>
+
+  <div style="display:flex; gap:30px; margin-top:24px">
+    <!-- daytona -->
+    <div style="flex:1.15">
+      <div style="display:flex; align-items:baseline; gap:10px; border-bottom:1px solid #52B79A; padding-bottom:7px">
+        <div style="font-size:15px; font-weight:700; color:#F3EFE5">Daytona</div>
+        <div class="mono" style="font-size:9px; color:#52B79A; letter-spacing:.1em">TITLE SPONSOR · EXECUTION</div>
+      </div>
+      <div style="display:grid; grid-template-columns:250px 1fr; gap:0; font-size:10px; margin-top:2px">
+        <div style="padding:7px 0; border-bottom:1px solid #2E3644" class="mono"><span style="color:#52B79A">create()</span></div>
+        <div style="padding:7px 0; border-bottom:1px solid #2E3644; color:#C9D0DA">a fresh sandbox per errand (snapshot, else TS base)</div>
+        <div style="padding:7px 0; border-bottom:1px solid #2E3644" class="mono"><span style="color:#52B79A">fs.uploadFile()</span></div>
+        <div style="padding:7px 0; border-bottom:1px solid #2E3644; color:#C9D0DA">push agent/ · site/ · verify/ into the box</div>
+        <div style="padding:7px 0; border-bottom:1px solid #2E3644" class="mono"><span style="color:#52B79A">computerUse.start()</span></div>
+        <div style="padding:7px 0; border-bottom:1px solid #2E3644; color:#C9D0DA">Xvfb + xfce4 + x11vnc + noVNC desktop</div>
+        <div style="padding:7px 0; border-bottom:1px solid #2E3644" class="mono"><span style="color:#52B79A">getSignedPreviewUrl()</span></div>
+        <div style="padding:7px 0; border-bottom:1px solid #2E3644; color:#C9D0DA">read-only live view for the family (6080)</div>
+        <div style="padding:7px 0; border-bottom:1px solid #2E3644" class="mono"><span style="color:#52B79A">createSession()</span></div>
+        <div style="padding:7px 0; border-bottom:1px solid #2E3644; color:#C9D0DA">resident Chromium + the portal server</div>
+        <div style="padding:7px 0; border-bottom:1px solid #2E3644" class="mono"><span style="color:#52B79A">executeCommand()</span></div>
+        <div style="padding:7px 0; border-bottom:1px solid #2E3644; color:#C9D0DA">one agent action per call, with a timeout</div>
+        <div style="padding:7px 0; border-bottom:1px solid #2E3644" class="mono"><span style="color:#52B79A">fs.downloadFile()</span></div>
+        <div style="padding:7px 0; border-bottom:1px solid #2E3644; color:#C9D0DA">pull the receipt-page snapshot out for proof</div>
+        <div style="padding:7px 0; border-bottom:1px solid #2E3644" class="mono"><span style="color:#52B79A">delete()</span></div>
+        <div style="padding:7px 0; border-bottom:1px solid #2E3644; color:#C9D0DA">erase the machine at the end of every run</div>
+      </div>
+      <div class="mono" style="font-size:9px; color:#98A2B2; margin-top:10px">src/sandbox.ts — DaytonaRunner</div>
+    </div>
+
+    <!-- nosana -->
+    <div style="flex:0.85">
+      <div style="display:flex; align-items:baseline; gap:10px; border-bottom:1px solid #8FB7E8; padding-bottom:7px">
+        <div style="font-size:15px; font-weight:700; color:#F3EFE5">Nosana</div>
+        <div class="mono" style="font-size:9px; color:#8FB7E8; letter-spacing:.1em">SPONSOR · INFERENCE</div>
+      </div>
+      <div style="font-size:10.5px; color:#C9D0DA; line-height:1.6; margin-top:10px">
+        An OpenAI-compatible endpoint, so the same code runs on Nosana GPUs, on your own Vertex project, or on a laptop Ollama. The default for a privacy-sensitive deployment is Nosana.
+      </div>
+      <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px; font-size:10.5px; color:#C9D0DA">
+        <div style="border-left:2px solid #8FB7E8; padding-left:10px"><b style="color:#F3EFE5">Vision</b> — reads the notice into a fixed JSON shape: type, deadline, three-line summary, person fields with source text + confidence.</div>
+        <div style="border-left:2px solid #8FB7E8; padding-left:10px"><b style="color:#F3EFE5">Policy</b> — decides the next browser action each turn, at temperature 0.</div>
+        <div style="border-left:2px solid #8FB7E8; padding-left:10px"><b style="color:#F3EFE5">Latency hedge</b> — if no answer in 6s, a second identical request is sent; the first reply wins.</div>
+        <div style="border-left:2px solid #8FB7E8; padding-left:10px"><b style="color:#F3EFE5">Split roles</b> — read a notice on Nosana, drive the browser on Vertex; one env var each.</div>
+      </div>
+      <div style="margin-top:12px; background:#161C25; border:1px solid #2E3644; padding:10px 12px" class="mono">
+        <div style="font-size:9px; color:#98A2B2">AI_PROVIDER=nosana</div>
+        <div style="font-size:9px; color:#98A2B2">OPERATOR_AI_PROVIDER=vertex</div>
+        <div style="font-size:9px; color:#98A2B2">NOSANA_BASE_URL=https://…/v1</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- matrix -->
+  <div style="margin-top:22px; border-top:1px solid #2E3644; padding-top:14px; display:flex; gap:32px; align-items:flex-start">
+    <div>
+      <div class="mono" style="font-size:8.5px; letter-spacing:.14em; color:#98A2B2">SANDBOX_PROVIDER</div>
+      <div style="display:flex; gap:7px; margin-top:7px">
+        <span class="mono" style="font-size:9px; padding:3px 9px; border:1px solid #52B79A; color:#52B79A">daytona · default</span>
+        <span class="mono" style="font-size:9px; padding:3px 9px; border:1px solid #3A4352; color:#C9D0DA">gcp</span>
+        <span class="mono" style="font-size:9px; padding:3px 9px; border:1px solid #3A4352; color:#C9D0DA">docker</span>
+        <span class="mono" style="font-size:9px; padding:3px 9px; border:1px solid #3A4352; color:#98A2B2">local · dev only</span>
+      </div>
+    </div>
+    <div style="flex:1; font-size:9.5px; color:#98A2B2; line-height:1.6">
+      The same desktop image (Xvfb + xfce4 + x11vnc + noVNC) is reproducible outside Daytona, so a venue firewall can never turn the demo into a slide. The Daytona path is the production one: one sandbox per errand, deleted at the end.
+    </div>
+  </div>
+
+  <div class="foot"><span>9 Daytona SDK surfaces · 2 model roles · 1 interface each</span><span>12 / 15</span></div>
+</section>
+
+<!-- ============================ 13 DEMO ============================ -->
+<section class="slide">
+  <div class="eyebrow"><span class="n">13</span><span>Live demo</span></div>
+  <h2>Three minutes, <em>one straight line.</em></h2>
+  <div class="ja">実演は「紙 → 撮影 → エージェント操作 → 承認 → 検証」の1本道です。</div>
+
+  <svg width="1136" height="120" viewBox="0 0 1136 120" style="margin-top:30px">
+    <rect x="0" y="18" width="95" height="34" fill="#D5CDBB"/>
+    <rect x="95" y="18" width="126" height="34" fill="#B9C6D8"/>
+    <rect x="221" y="18" width="126" height="34" fill="#9DB3CE"/>
+    <rect x="347" y="18" width="284" height="34" fill="#2C4A73"/>
+    <rect x="631" y="18" width="95" height="34" fill="#C99A3B"/>
+    <rect x="726" y="18" width="126" height="34" fill="#BF3A2B"/>
+    <rect x="852" y="18" width="126" height="34" fill="#8FB7A6"/>
+    <rect x="978" y="18" width="158" height="34" fill="#1D6A58"/>
+
+    <g font-size="9" class="mono" fill="#15171B">
+      <text x="0" y="66">0:00</text><text x="95" y="66">0:15</text><text x="221" y="66">0:35</text>
+      <text x="347" y="66">0:55</text><text x="631" y="66">1:40</text><text x="726" y="66">1:55</text>
+      <text x="852" y="66">2:15</text><text x="978" y="66">2:35</text><text x="1136" y="66" text-anchor="end">3:00</text>
+    </g>
+    <line x1="0" y1="52" x2="1136" y2="52" stroke="#D5CDBB"/>
+    <g stroke="#15171B" stroke-width="1">
+      <line x1="0" y1="52" x2="0" y2="58"/><line x1="95" y1="52" x2="95" y2="58"/>
+      <line x1="221" y1="52" x2="221" y2="58"/><line x1="347" y1="52" x2="347" y2="58"/>
+      <line x1="631" y1="52" x2="631" y2="58"/><line x1="726" y1="52" x2="726" y2="58"/>
+      <line x1="852" y1="52" x2="852" y2="58"/><line x1="978" y1="52" x2="978" y2="58"/>
+      <line x1="1135" y1="52" x2="1135" y2="58"/>
+    </g>
+  </svg>
+
+  <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:12px; margin-top:8px">
+    <div>
+      <div class="mono" style="font-size:8.5px; color:var(--ink-3)">0:00 – 0:15</div>
+      <div style="font-size:11.5px; font-weight:700; margin-top:3px">The paper</div>
+      <div style="font-size:10px; color:var(--ink-2); line-height:1.45; margin-top:3px">Hold up the invoice. Say the one sentence: “This is what 8 million households get, and cannot use.”</div>
+    </div>
+    <div>
+      <div class="mono" style="font-size:8.5px; color:var(--ink-3)">0:15 – 0:35</div>
+      <div style="font-size:11.5px; font-weight:700; margin-top:3px">Photo → three lines</div>
+      <div style="font-size:10px; color:var(--ink-2); line-height:1.45; margin-top:3px">Tap the sample. Large type appears; the browser speaks the deadline.</div>
+    </div>
+    <div>
+      <div class="mono" style="font-size:8.5px; color:var(--ink-3)">0:35 – 0:55</div>
+      <div style="font-size:11.5px; font-weight:700; margin-top:3px">A desktop appears</div>
+      <div style="font-size:10px; color:var(--ink-2); line-height:1.45; margin-top:3px">“This is a real, isolated machine. It has never seen this person before.”</div>
+    </div>
+    <div>
+      <div class="mono" style="font-size:8.5px; color:var(--ink-3)">0:55 – 1:40</div>
+      <div style="font-size:11.5px; font-weight:700; margin-top:3px">The agent works</div>
+      <div style="font-size:10px; color:var(--ink-2); line-height:1.45; margin-top:3px">Fields fill on screen while the action log streams: “お客様番号 ← 請求書”.</div>
+    </div>
+    <div>
+      <div class="mono" style="font-size:8.5px; color:var(--ink-3)">1:40 – 1:55</div>
+      <div style="font-size:11.5px; font-weight:700; margin-top:3px">Two questions</div>
+      <div style="font-size:10px; color:var(--ink-2); line-height:1.45; margin-top:3px">“Which bank?” — the only thing the paper cannot know.</div>
+    </div>
+    <div>
+      <div class="mono" style="font-size:8.5px; color:var(--red)">1:55 – 2:15</div>
+      <div style="font-size:11.5px; font-weight:700; margin-top:3px">The seal</div>
+      <div style="font-size:10px; color:var(--ink-2); line-height:1.45; margin-top:3px">Read-back, then say “yes”. Point out that “no” is a real option.</div>
+    </div>
+    <div>
+      <div class="mono" style="font-size:8.5px; color:var(--ink-3)">2:15 – 3:00</div>
+      <div style="font-size:11.5px; font-weight:700; margin-top:3px">Proof + erasure</div>
+      <div style="font-size:10px; color:var(--ink-2); line-height:1.45; margin-top:3px">Terminal scrolls the ✔ lines, <span class="mono">exit 0</span>, receipt number. The sandbox disappears.</div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:26px; margin-top:30px">
+    <div style="flex:1; border:1px solid var(--ink); background:#fff; padding:12px 14px">
+      <div class="mono" style="font-size:8.5px; letter-spacing:.14em; color:var(--ink-3)">ON SCREEN</div>
+      <div style="font-size:11px; color:var(--ink-2); line-height:1.5; margin-top:4px">One phone window, one live desktop, one terminal. Three panes, no switching.</div>
+    </div>
+    <div style="flex:1; border:1px solid var(--ink); background:#fff; padding:12px 14px">
+      <div class="mono" style="font-size:8.5px; letter-spacing:.14em; color:var(--ink-3)">UNDER THE HOOD</div>
+      <div style="font-size:11px; color:var(--ink-2); line-height:1.5; margin-top:4px">Every step is an SSE event, so the /ops view can replay the same run at 1× / 4× / 16×.</div>
+    </div>
+    <div style="flex:1; border:1px solid var(--red); background:var(--red-soft); padding:12px 14px">
+      <div class="mono" style="font-size:8.5px; letter-spacing:.14em; color:var(--red)">IF THE VENUE WIFI DIES</div>
+      <div style="font-size:11px; color:var(--ink-2); line-height:1.5; margin-top:4px">The run is already recorded. Switch to /ops, press 1×, and narrate the same evidence.</div>
+    </div>
+  </div>
+
+  <div class="foot"><span>Target: 90 seconds from photo to receipt</span><span>13 / 15</span></div>
+</section>
+
+<!-- ============================ 14 CRITERIA ============================ -->
+<section class="slide">
+  <div class="eyebrow"><span class="n">14</span><span>Against the rubric</span></div>
+  <h2>Judged on four things. <em>Here is the evidence.</em></h2>
+  <div class="ja">4つの審査基準に対して、実装・実測・再現手段で答えます。</div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:30px">
+    <div style="border:1px solid var(--ink); background:#fff; padding:16px 18px">
+      <div style="display:flex; align-items:baseline; gap:10px">
+        <div class="mono" style="font-size:9px; color:var(--red)">01</div>
+        <div style="font-size:15px; font-weight:700">Completeness</div>
+        <div class="mono" style="font-size:8.5px; color:var(--ink-3); margin-left:auto">SHIPPED, NOT MOCKED</div>
+      </div>
+      <div style="font-size:11px; color:var(--ink-2); line-height:1.6; margin-top:7px">
+        A single run goes photo → explanation → live sandbox → typed form → human approval → submission → verifier <span class="mono">exit 0</span> → receipt → teardown.
+      </div>
+      <div style="margin-top:8px; font-size:10px; color:var(--ink-3); line-height:1.7">
+        <div>▸ <span class="mono">npm test</span> — verifier + guardrail unit tests</div>
+        <div>▸ 5 municipal procedures available in the target portal</div>
+        <div>▸ Failure paths: cancel, read failure, timeout, unreachable site</div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--ink); background:#fff; padding:16px 18px">
+      <div style="display:flex; align-items:baseline; gap:10px">
+        <div class="mono" style="font-size:9px; color:var(--red)">02</div>
+        <div style="font-size:15px; font-weight:700">Innovation</div>
+        <div class="mono" style="font-size:8.5px; color:var(--ink-3); margin-left:auto">AUDITABLE AGENCY</div>
+      </div>
+      <div style="font-size:11px; color:var(--ink-2); line-height:1.6; margin-top:7px">
+        Most agents are judged on what they produce. Ours is judged on what it can <i>prove</i>: every value carries its origin, and the proof is checked by a program, not the model.
+      </div>
+      <div style="margin-top:8px; font-size:10px; color:var(--ink-3); line-height:1.7">
+        <div>▸ Code-level refusal of unsourced values</div>
+        <div>▸ “Declared not-applicable” instead of silent omission</div>
+        <div>▸ The approver sees values grouped by origin</div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--ink); background:#fff; padding:16px 18px">
+      <div style="display:flex; align-items:baseline; gap:10px">
+        <div class="mono" style="font-size:9px; color:var(--red)">03</div>
+        <div style="font-size:15px; font-weight:700">Real-life problem solving</div>
+        <div class="mono" style="font-size:8.5px; color:var(--ink-3); margin-left:auto">NOT A DEMO-GRAM</div>
+      </div>
+      <div style="font-size:11px; color:var(--ink-2); line-height:1.6; margin-top:7px">
+        The bottleneck is not understanding the letter — it is the 20 minutes of typing after it. That labour currently lands on an adult child, by phone, with the parent’s password.
+      </div>
+      <div style="margin-top:8px; font-size:10px; color:var(--ink-3); line-height:1.7">
+        <div>▸ Two personas, one handoff, three human actions</div>
+        <div>▸ Works on real municipal portal layouts (not a toy form)</div>
+        <div>▸ Deadlines are the unit of value, not messages</div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--ink); background:#fff; padding:16px 18px">
+      <div style="display:flex; align-items:baseline; gap:10px">
+        <div class="mono" style="font-size:9px; color:var(--red)">04</div>
+        <div style="font-size:15px; font-weight:700">Sponsored product usage</div>
+        <div class="mono" style="font-size:8.5px; color:var(--ink-3); margin-left:auto">CORE LOOP</div>
+      </div>
+      <div style="font-size:11px; color:var(--ink-2); line-height:1.6; margin-top:7px">
+        Daytona is the execution substrate: nine SDK surfaces, one sandbox per errand, deleted at the end. Nosana is the privacy-safe inference path for documents full of personal data.
+      </div>
+      <div style="margin-top:8px; font-size:10px; color:var(--ink-3); line-height:1.7">
+        <div>▸ Remove Daytona and the product does not exist</div>
+        <div>▸ Remove Nosana and PII must go to a commercial API</div>
+        <div>▸ Provider switches keep both honest</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot"><span>Evidence over adjectives</span><span>14 / 15</span></div>
+</section>
+
+<!-- ============================ 15 CLOSE ============================ -->
+<section class="slide dark">
+  <div class="eyebrow"><span class="n">15</span><span>Close</span></div>
+  <div style="margin-top:36px; max-width:940px">
+    <h1 style="font-size:52px; line-height:1.06; letter-spacing:-.032em">Digital government has<br>a last mile.</h1>
+    <div style="font-size:52px; line-height:1.06; letter-spacing:-.032em; color:#E07364; margin-top:6px">We automated it —<br>and left the receipts.</div>
+  </div>
+
+  <div style="display:flex; gap:34px; margin-top:44px">
+    <div style="flex:1.1">
+      <div class="mono" style="font-size:9px; letter-spacing:.14em; color:#98A2B2">WHAT SHIPS TODAY</div>
+      <div style="font-size:11px; color:#C9D0DA; line-height:1.7; margin-top:7px">
+        A working end-to-end run, a deterministic verifier, a live ops view, and a provider-switchable architecture. Nothing in the repo needs a key to be read.
+      </div>
+    </div>
+    <div style="flex:1">
+      <div class="mono" style="font-size:9px; letter-spacing:.14em; color:#98A2B2">NEXT · 90 DAYS</div>
+      <div style="font-size:11px; color:#C9D0DA; line-height:1.7; margin-top:7px">
+        1 · Pilot with one municipality on 5 procedures.<br>
+        2 · Insurer and pension notices (same shape, higher volume).<br>
+        3 · Family plan with a monthly audit digest.
+      </div>
+    </div>
+    <div style="flex:1">
+      <div class="mono" style="font-size:9px; letter-spacing:.14em; color:#98A2B2">TRY IT</div>
+      <div style="font-size:11px; color:#C9D0DA; line-height:1.7; margin-top:7px">
+        <span class="mono" style="color:#52B79A">npm install &amp;&amp; npm start</span><br>
+        Sample invoice included. Sandbox needs Docker, or a Daytona key.
+      </div>
+    </div>
+  </div>
+
+  <div style="position:absolute; left:72px; right:72px; bottom:96px; border-top:1px solid #2E3644; padding-top:18px; display:flex; align-items:flex-end">
+    <div>
+      <div style="font-size:26px; font-weight:700; letter-spacing:-.02em">Omakase Tetsuzuki</div>
+      <div style="font-size:11px; color:#98A2B2; margin-top:4px; letter-spacing:.28em">お ま か せ 手 続 き</div>
+    </div>
+    <div style="margin-left:auto; text-align:right; font-size:10.5px; color:#98A2B2; line-height:1.8">
+      <div>Team &lt;TEAM_NAME&gt; · &lt;MEMBER_NAMES&gt;</div>
+      <div class="mono" style="color:#C9D0DA">github.com/&lt;ORG&gt;/&lt;REPO&gt;</div>
+      <div class="mono">Daytona HackSprint Tokyo · 2026-11-15</div>
+    </div>
+  </div>
+
+  <div class="foot"><span>Built in 75 minutes · verified with a program</span><span>15 / 15</span></div>
+</section>

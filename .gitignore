@@ -1,0 +1,31 @@
+# --- シークレット / ローカル状態（絶対にコミットしない） ---
+.env
+.env.*
+!.env.example
+.secret-map
+
+# --- OS / エディタ ---
+.DS_Store
+._*
+Thumbs.db
+
+# --- Node ---
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- ログ / キャッシュ / カバレッジ ---
+*.log
+.cache/
+coverage/
+
+# --- ツールの作業ディレクトリ（ローカルのみ） ---
+.playwright-cli/
+.tmp/
+
+# --- ビルド / レンダリング生成物（コマンドで再生成できるもの） ---
+dist/
+demo/out/
+demo/video/out/
+submission/preview/

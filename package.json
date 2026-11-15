@@ -1,0 +1,25 @@
+{
+  "name": "omakase-tetsuzuki",
+  "version": "0.1.0",
+  "private": true,
+  "description": "おまかせ手続き — 届いた通知を撮るだけで、AI が隔離マシンでパソコン操作を代行し、お年寄りの手続きを済ませる",
+  "type": "module",
+  "engines": {
+    "node": ">=23.6"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env src/server.ts",
+    "desktop:build": "docker build -t omakase-desktop desktop",
+    "make:notice": "node scripts/make-notice.mjs",
+    "test": "node --test tests/",
+    "gcp:up": "node --env-file-if-exists=.env scripts/gcp.mjs up",
+    "gcp:deploy": "node --env-file-if-exists=.env scripts/gcp.mjs deploy",
+    "gcp:allow": "node --env-file-if-exists=.env scripts/gcp.mjs allow",
+    "gcp:down": "node --env-file-if-exists=.env scripts/gcp.mjs down",
+    "gcp:destroy": "node --env-file-if-exists=.env scripts/gcp.mjs destroy"
+  },
+  "dependencies": {
+    "@daytona/sdk": "^0.231.1",
+    "playwright": "^1.65.0"
+  }
+}

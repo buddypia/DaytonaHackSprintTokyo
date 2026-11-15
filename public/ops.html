@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>おまかせ手続き · 裏側</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23c4532d'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='white'%3E%E3%81%8A%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #0b0f14; --panel: #11171f; --panel2: #151d27; --line: #223040; --ink: #e6edf3; --muted: #7d8da1; --dim: #4b5a6b;
+    --cyan: #3fd2e8; --amber: #f2b33d; --green: #46d38a; --red: #ff6b6b; --violet: #a78bfa; --accent: #e0703f;
+    --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; background: radial-gradient(1200px 600px at 50% -10%, #142130 0%, var(--bg) 60%); color: var(--ink); font-family: "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif; font-size: 13px; }
+  .app { display: grid; grid-template-rows: auto 1fr; height: 100vh; padding: 14px; gap: 12px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; min-height: 0; }
+  .ph { display: flex; align-items: baseline; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 11px; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+  .ph b { color: var(--ink); font-weight: 600; }
+  .ph .r { margin-left: auto; text-transform: none; letter-spacing: 0; }
+
+  /* ヘッダー */
+  .top { display: grid; grid-template-columns: auto repeat(6, minmax(0, 1fr)) auto; align-items: stretch; }
+  .top > div { padding: 10px 16px; border-right: 1px solid var(--line); }
+  .top > div:last-child { border-right: 0; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .dots { display: flex; gap: 6px; } .dots i { width: 11px; height: 11px; border-radius: 50%; display: block; }
+  .brand h1 { margin: 0; font-size: 15px; font-family: var(--mono); letter-spacing: .02em; }
+  .brand p { margin: 2px 0 0; color: var(--muted); font-size: 11px; }
+  .kpi .k { color: var(--muted); font-size: 11px; }
+  .kpi .v { font-family: var(--mono); font-size: 24px; font-weight: 700; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .kpi .v small { font-size: 12px; color: var(--muted); font-weight: 500; margin-left: 4px; }
+  .ctl { display: flex; flex-direction: column; gap: 6px; justify-content: center; }
+  .ctl .row { display: flex; gap: 6px; }
+  .ctl button, .ctl a { font: 600 11px var(--mono); color: var(--ink); background: var(--panel2); border: 1px solid var(--line); border-radius: 6px; padding: 5px 9px; cursor: pointer; text-decoration: none; white-space: nowrap; }
+  .ctl button.on { background: var(--cyan); color: #04212a; border-color: var(--cyan); }
+  .ctl select { font: 11px var(--mono); background: var(--panel2); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 4px 6px; max-width: 220px; }
+
+  .body { display: grid; grid-template-columns: 300px minmax(0, 1fr) 360px; gap: 12px; min-height: 0; }
+  .col { display: flex; flex-direction: column; min-height: 0; }
+  .scroll { overflow: auto; min-height: 0; }
+
+  /* エージェント一覧 */
+  .roster { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .card { border: 1px solid var(--line); background: var(--panel2); border-radius: 8px; padding: 10px 12px; transition: border-color .3s, box-shadow .3s; }
+  .card.run { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan) inset, 0 0 18px rgba(63,210,232,.15); }
+  .card.wait { border-color: var(--amber); box-shadow: 0 0 0 1px var(--amber) inset; }
+  .card.fail { border-color: var(--red); }
+  .card .hd { display: flex; align-items: center; gap: 8px; }
+  .av { width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center; font-weight: 800; font-size: 13px; color: #0b0f14; flex: none; }
+  .card .nm { font-weight: 700; font-size: 13px; }
+  .pill { margin-left: auto; font: 600 10px var(--mono); padding: 2px 7px; border-radius: 99px; background: #1d2834; color: var(--muted); white-space: nowrap; }
+  .pill.run { background: rgba(63,210,232,.15); color: var(--cyan); }
+  .pill.wait { background: rgba(242,179,61,.15); color: var(--amber); }
+  .pill.ok { background: rgba(70,211,138,.15); color: var(--green); }
+  .pill.fail { background: rgba(255,107,107,.15); color: var(--red); }
+  .card .ds { color: var(--muted); font-size: 11.5px; line-height: 1.55; margin: 6px 0 4px; }
+  .card .wh { font: 11px var(--mono); color: var(--cyan); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .card .st { font: 11px var(--mono); color: var(--dim); margin-top: 4px; }
+  .card .st b { color: var(--ink); font-weight: 600; }
+  .card.sbx { background: linear-gradient(135deg, rgba(167,139,250,.12), rgba(63,210,232,.06)); border-color: #3b3363; }
+
+  /* フロー図 */
+  .map { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .phases { display: flex; gap: 0; padding: 10px 14px 0; }
+  .phases span { flex: 1; text-align: center; font: 600 11px var(--mono); color: var(--dim); padding: 6px 0; border-bottom: 2px solid var(--line); transition: color .3s, border-color .3s; }
+  .phases span.past { color: var(--muted); border-color: #2f4a5f; }
+  .phases span.now { color: var(--cyan); border-color: var(--cyan); }
+  .legend { padding: 6px 14px 0; color: var(--muted); font-size: 11px; display: flex; gap: 14px; }
+  .legend i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: 0; }
+  svg { flex: 1; width: 100%; min-height: 0; display: block; }
+  .edge { fill: none; stroke: #263646; stroke-width: 1.4; stroke-dasharray: 4 5; transition: stroke .3s; }
+  .edge.hot { stroke-width: 2; stroke-dasharray: 6 4; animation: dash .6s linear infinite; }
+  @keyframes dash { to { stroke-dashoffset: -20; } }
+  .elabel { fill: var(--dim); font: 10px var(--mono); transition: fill .3s; }
+  .elabel.hot { fill: var(--ink); }
+  .node rect.bx { fill: #121a24; stroke: #2a3a4c; stroke-width: 1.2; transition: stroke .3s, fill .3s; }
+  .node text.n { fill: var(--ink); font-size: 13px; font-weight: 700; }
+  .node text.s { fill: var(--muted); font: 10px var(--mono); }
+  .node text.ic { fill: #0b0f14; font-size: 13px; font-weight: 800; }
+  .node .ring { fill: none; stroke-width: 2; opacity: 0; }
+  .node.run rect.bx { stroke: var(--cyan); fill: #10232c; }
+  .node.run .ring { stroke: var(--cyan); animation: ring 1.4s ease-out infinite; }
+  .node.wait rect.bx { stroke: var(--amber); fill: #261f10; }
+  .node.wait .ring { stroke: var(--amber); animation: ring 1.4s ease-out infinite; }
+  .node.ok rect.bx { stroke: var(--green); }
+  .node.fail rect.bx { stroke: var(--red); fill: #2a1414; }
+  .node.off { opacity: .35; }
+  @keyframes ring { 0% { opacity: .7; transform: scale(1); } 100% { opacity: 0; transform: scale(1.12); } }
+  .node .ring { transform-box: fill-box; transform-origin: center; }
+  .region { fill: rgba(167,139,250,.05); stroke: #4a3f86; stroke-width: 1.4; stroke-dasharray: 8 6; transition: all .4s; }
+  .region.up { fill: rgba(167,139,250,.09); stroke: var(--violet); stroke-dasharray: none; }
+  .region.gone { fill: rgba(80,80,80,.04); stroke: #333c48; }
+  .rlabel { fill: var(--violet); font: 700 12px var(--mono); }
+  .rsub { fill: var(--muted); font: 10px var(--mono); }
+  .empty { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+  .empty div { background: rgba(11,15,20,.85); border: 1px solid var(--line); border-radius: 10px; padding: 18px 22px; text-align: center; color: var(--muted); pointer-events: auto; line-height: 1.8; }
+  .empty a { color: var(--cyan); }
+
+  /* 右列 */
+  .feed { font: 11.5px/1.55 var(--mono); padding: 8px 10px; }
+  .feed .cmd { color: var(--green); padding: 2px 4px 6px; }
+  .feed .cmd::after { content: "▋"; animation: blink 1s steps(1) infinite; margin-left: 2px; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .ln { display: grid; grid-template-columns: 58px 1fr; gap: 8px; padding: 4px 6px; border-left: 2px solid transparent; border-radius: 3px; }
+  .ln:first-of-type { background: rgba(63,210,232,.06); }
+  .ln time { color: var(--dim); }
+  .ln .tag { font-weight: 700; margin-right: 6px; }
+  .ln.err { background: rgba(255,107,107,.08); border-left-color: var(--red); }
+  .ln.ask { border-left-color: var(--amber); }
+  .shot { padding: 10px; }
+  .shot img { width: 100%; border-radius: 6px; display: block; background: #fff; }
+  .shot .none { color: var(--dim); text-align: center; padding: 26px 0; font-size: 12px; }
+  .fails { padding: 8px 12px; font: 11.5px/1.6 var(--mono); }
+  .fails .none { color: var(--dim); }
+  .fails div.f { color: var(--red); }
+  .right { display: grid; grid-template-rows: minmax(0, 1fr) auto auto; gap: 12px; min-height: 0; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="panel top">
+    <div class="brand">
+      <div class="dots"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div>
+      <div><h1>おまかせ手続き · 裏側</h1><p>AI エージェントたちがどう動いているか</p></div>
+    </div>
+    <div class="kpi"><div class="k">経過時間</div><div class="v" id="k-time">--:--</div></div>
+    <div class="kpi"><div class="k">書類から読んだ情報</div><div class="v" id="k-auto">–</div></div>
+    <div class="kpi"><div class="k">ご本人への質問</div><div class="v" id="k-ask">0</div></div>
+    <div class="kpi"><div class="k">エージェントの手数</div><div class="v" id="k-steps">0</div></div>
+    <div class="kpi"><div class="k">サンドボックス起動</div><div class="v" id="k-boot">–</div></div>
+    <div class="kpi"><div class="k">照合 exitCode</div><div class="v" id="k-exit">–</div></div>
+    <div class="ctl">
+      <div class="row"><select id="runs"><option value="">実行待ち…</option></select><a href="/" target="_blank">利用者画面 ↗</a></div>
+      <div class="row"><button id="live" class="on">● ライブ</button><button id="replay">↺ 最初から</button><button data-speed="1" class="on">1x</button><button data-speed="4">4x</button><button data-speed="16">16x</button></div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="panel col">
+      <div class="ph"><b>Agents</b><span class="r" id="agent-count"></span></div>
+      <div class="scroll roster" id="roster"></div>
+    </div>
+
+    <div class="panel col map">
+      <div class="ph"><b>Flow map</b> 誰が・何を・誰に渡したか<span class="r" id="run-id"></span></div>
+      <div class="phases" id="phases"></div>
+      <div class="legend">
+        <span><i style="background:var(--cyan)"></i>データの受け渡し</span>
+        <span><i style="background:var(--amber)"></i>ご本人とのやり取り</span>
+        <span><i style="background:var(--green)"></i>検証・完了</span>
+        <span><i style="background:var(--red)"></i>失敗</span>
+        <span><i style="background:var(--violet)"></i>Daytona の隔離マシン</span>
+      </div>
+      <svg id="svg" viewBox="0 0 1000 580" preserveAspectRatio="xMidYMid meet">
+        <g id="regions"></g><g id="edges"></g><g id="nodes"></g><g id="dots"></g>
+      </svg>
+      <div class="empty" id="empty"><div>まだ実行がありません。<br><a href="/" target="_blank">利用者画面</a>で「見本の通知で試す」を押すと、ここで動きが見えます。</div></div>
+    </div>
+
+    <div class="right">
+      <div class="panel col">
+        <div class="ph"><b>Activity</b> 実イベント<span class="r" id="ev-count"></span></div>
+        <div class="scroll feed" id="feed"><div class="cmd">$ tail -f run-events.log</div></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><b>Sandbox screen</b> 隔離マシンの画面<span class="r"><a id="viewer" target="_blank" style="color:var(--cyan);display:none">ライブ画面 ↗</a></span></div>
+        <div class="shot"><img id="shot" alt="サンドボックス内のブラウザ" style="display:none"><div class="none" id="shot-none">操作エージェントが動き出すと表示されます</div></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><b>Failures</b> 失敗・中断</div>
+        <div class="fails" id="fails"><div class="none">なし</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const SVG = "http://www.w3.org/2000/svg";
+const C = { cyan: "#3fd2e8", amber: "#f2b33d", green: "#46d38a", red: "#ff6b6b", violet: "#a78bfa" };
+
+// エージェントと関係者。x, y はフロー図上の中心。inBox は Daytona サンドボックスの中にあるもの
+const NODES = {
+  person:   { x: 100, y: 290, name: "ご本人", icon: "人", color: "#f2b33d", sub: "撮影・回答・承認" },
+  reader:   { x: 320, y: 90,  name: "読み取り AI", icon: "読", color: "#3fd2e8", sub: "通知 → 3行の説明", agent: true,
+              desc: "通知の写真を読み、3行の説明と、書類に書かれたご本人の情報（氏名・生年月日など）を取り出す" },
+  agent:    { x: 320, y: 215, name: "操作エージェント", icon: "操", color: "#a78bfa", sub: "次の一手を決める", agent: true,
+              desc: "ブラウザの画面（[eN] 付きの一覧）を読み、入力・選択・クリックを1手ずつ決める。値には必ず出どころを付け、本人にしか分からないことは質問し、最後の送信は本人の承認を取ってから押す", where: "src/operator.ts（手元のサーバー）" },
+  orch:     { x: 320, y: 360, name: "オーケストレーター", icon: "司", color: "#e0703f", sub: "進行と中継", agent: true,
+              desc: "全体の進行役。隔離マシンの準備と破棄、ご本人とのやり取り、検証の実行を受け持つ", where: "src/flow.ts（手元のサーバー）" },
+  family:   { x: 320, y: 500, name: "ご家族", icon: "家", color: "#f472b6", sub: "結果の報告" },
+  browser:  { x: 620, y: 170, name: "ブラウザ", icon: "B", color: "#93c5fd", sub: "Chromium（常駐）", agent: true, inBox: true,
+              desc: "隔離マシンの画面上で申請サイト（既定はマシン内の検証用サイト）を開いている。1手ごとに操作し、画面を一覧にして返す", where: "agent/browser.mjs + act.mjs（サンドボックス内）" },
+  screen:   { x: 620, y: 300, name: "画面中継", icon: "映", color: "#cbd5e1", sub: "noVNC / スクショ", inBox: true },
+  verifier: { x: 620, y: 430, name: "検証", icon: "検", color: "#46d38a", sub: "サイトの画面と照合", agent: true, inBox: true,
+              desc: "入力値がすべて申請サイトの確認画面に出ているか、出どころがあるか、書類の情報の入れ忘れが無いか、完了画面と番号を、モデルを使わずに確かめて exitCode を返す", where: "verify/verify.mjs（サンドボックス内）" },
+  site:     { x: 880, y: 170, name: "電子申請システム", icon: "申", color: "#fbbf24", sub: "検証用・マシン内で起動" },
+};
+const EDGES = [
+  ["photo",   "person",   "reader",   "通知の写真", -22],
+  ["explain", "reader",   "person",   "3行の説明", -22],
+  ["extract", "reader",   "agent",    "ご本人の情報", 0],
+  ["boot",    "orch",     "browser",  "起動・申請先", 18],
+  ["cmd",     "agent",    "browser",  "操作（ref 指定）", -14],
+  ["obs",     "browser",  "agent",    "画面の一覧", -14],
+  ["fill",    "browser",  "site",     "入力・送信（HTTPS）", 0],
+  ["screen",  "browser",  "screen",   "画面", 0],
+  ["ask",     "agent",    "person",   "質問・承認", 18],
+  ["ans",     "person",   "agent",    "回答・はい", 18],
+  ["check",   "browser",  "verifier", "確認・完了画面", 30],
+  ["exit",    "verifier", "orch",     "exitCode", 0],
+  ["family",  "orch",     "family",   "整理番号", 0],
+];
+const PHASES = [["READING", "読み取り"], ["SANDBOX_READY", "隔離マシン準備"], ["FILLING", "操作"], ["ASKING", "質問"], ["CONFIRMING", "承認"], ["VERIFYING", "照合"], ["DONE", "完了"]];
+const AGENT_TAG = { reader: "読み取り", sandbox: "Daytona", operator: "操作" };
+const TAG_COLOR = { 読み取り: "#3fd2e8", Daytona: "#a78bfa", 操作: "#a78bfa", 司令: "#e0703f", ご本人: "#f2b33d", 検証: "#46d38a", 家族: "#f472b6", 失敗: "#ff6b6b" };
+
+// ---------- 図の組み立て ----------
+const paths = {};
+function el(tag, attrs, parent) {
+  const e = document.createElementNS(SVG, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  parent?.append(e);
+  return e;
+}
+function buildMap() {
+  const region = el("rect", { x: 500, y: 40, width: 240, height: 510, rx: 16, class: "region", id: "region" }, $("regions"));
+  el("text", { x: 516, y: 66, class: "rlabel", id: "rlabel" }, $("regions")).textContent = "Daytona サンドボックス";
+  el("text", { x: 516, y: 84, class: "rsub", id: "rsub" }, $("regions")).textContent = "未起動 · 1 件の手続きごとに作って、終わったら破棄";
+  for (const [id, a, b, label, bend] of EDGES) {
+    const A = NODES[a], B = NODES[b];
+    const mx = (A.x + B.x) / 2, my = (A.y + B.y) / 2;
+    const len = Math.hypot(B.x - A.x, B.y - A.y) || 1;
+    const nx = -(B.y - A.y) / len, ny = (B.x - A.x) / len;
+    const cx = mx + nx * bend * 2, cy = my + ny * bend * 2;
+    const p = el("path", { d: `M${A.x},${A.y} Q${cx},${cy} ${B.x},${B.y}`, class: "edge", id: `e-${id}` }, $("edges"));
+    paths[id] = p;
+    const t = el("text", { x: mx + nx * bend + 4, y: my + ny * bend - 4, class: "elabel", id: `l-${id}` }, $("edges"));
+    t.textContent = label;
+  }
+  for (const [id, n] of Object.entries(NODES)) {
+    const g = el("g", { class: "node", id: `n-${id}`, transform: `translate(${n.x - 90},${n.y - 28})` }, $("nodes"));
+    el("rect", { class: "ring", x: 0, y: 0, width: 180, height: 56, rx: 12 }, g);
+    el("rect", { class: "bx", x: 0, y: 0, width: 180, height: 56, rx: 12 }, g);
+    el("rect", { x: 10, y: 14, width: 28, height: 28, rx: 7, fill: n.color }, g);
+    el("text", { class: "ic", x: 24, y: 33, "text-anchor": "middle" }, g).textContent = n.icon;
+    el("text", { class: "n", x: 48, y: 25 }, g).textContent = n.name;
+    el("text", { class: "s", x: 48, y: 42, id: `s-${id}` }, g).textContent = n.sub;
+  }
+  $("phases").innerHTML = PHASES.map(([k, v]) => `<span data-p="${k}">${v}</span>`).join("");
+}
+
+// ---------- 状態 ----------
+let S;
+function reset() {
+  S = { status: {}, count: {}, last: {}, where: {}, kpi: { auto: null, ask: 0, steps: 0, boot: null, exit: null }, phase: null, sandbox: "未起動", sandboxLabel: "Daytona サンドボックス", fails: [], feed: 0, viewer: null, ended: false };
+  $("feed").innerHTML = '<div class="cmd">$ tail -f run-events.log</div>';
+  $("fails").innerHTML = '<div class="none">なし</div>';
+  $("shot").style.display = "none"; $("shot-none").style.display = "";
+  $("viewer").style.display = "none";
+  $("dots").innerHTML = "";
+  document.querySelectorAll(".edge,.elabel").forEach((e) => e.classList.remove("hot"));
+  render();
+}
+function setStatus(id, st, sub) {
+  S.status[id] = st;
+  if (sub) $(`s-${id}`).textContent = sub;
+}
+function bump(id, at) { S.count[id] = (S.count[id] ?? 0) + 1; S.last[id] = at; }
+
+function render() {
+  for (const id of Object.keys(NODES)) {
+    const g = $(`n-${id}`);
+    g.setAttribute("class", `node ${S.status[id] ?? ""} ${NODES[id].inBox && S.sandbox === "破棄済み" ? "off" : ""}`);
+    if (!S.status[id]) $(`s-${id}`).textContent = NODES[id].sub;
+  }
+  $("region").setAttribute("class", `region ${S.sandbox === "稼働中" ? "up" : S.sandbox === "破棄済み" ? "gone" : ""}`);
+  $("rlabel").textContent = S.sandboxLabel;
+  $("rsub").textContent = { 未起動: "未起動 · 1 件の手続きごとに作って、終わったら破棄", 起動中: "起動中…", 稼働中: `稼働中 · 画面付きの隔離マシン${S.kpi.boot ? `（${S.kpi.boot} 秒で起動）` : ""}`, 破棄済み: "破棄済み · 個人情報はマシンごと消えました" }[S.sandbox];
+  const idx = PHASES.findIndex(([k]) => k === S.phase);
+  document.querySelectorAll("#phases span").forEach((s, i) => s.className = i < idx ? "past" : i === idx ? "now" : "");
+  const k = S.kpi;
+  $("k-auto").innerHTML = k.auto != null ? `${k.auto}<small>項目</small>` : "–";
+  $("k-ask").textContent = k.ask;
+  $("k-steps").textContent = k.steps;
+  $("k-boot").innerHTML = k.boot ? `${k.boot}<small>秒</small>` : "–";
+  $("k-exit").textContent = k.exit ?? "–";
+  $("k-exit").style.color = k.exit == null ? "" : k.exit === 0 ? "var(--green)" : "var(--red)";
+  renderRoster();
+}
+const PILL = { run: "実行中", wait: "ご本人待ち", ok: "完了", fail: "失敗", off: "破棄" };
+function renderRoster() {
+  const agents = Object.entries(NODES).filter(([, n]) => n.agent);
+  $("agent-count").textContent = `${agents.length} 体 + 隔離マシン`;
+  const sbxPill = { 未起動: "", 起動中: "run", 稼働中: "ok", 破棄済み: "off" }[S.sandbox];
+  let html = `<div class="card sbx"><div class="hd"><div class="av" style="background:var(--violet)">D</div><div class="nm">${esc(S.sandboxLabel)}</div><span class="pill ${sbxPill}">${S.sandbox}</span></div>
+    <div class="ds">ブラウザと検証を閉じ込める使い捨てのマシン。画面（Xvfb + noVNC）付き。中で検証用の申請サイトを起動し、外には何も送らない</div>
+    <div class="st">起動 <b>${S.kpi.boot ? S.kpi.boot + " 秒" : "–"}</b> · 終了後に破棄</div></div>`;
+  for (const [id, n] of agents) {
+    const st = S.status[id] ?? "";
+    html += `<div class="card ${st === "run" ? "run" : st === "wait" ? "wait" : st === "fail" ? "fail" : ""}">
+      <div class="hd"><div class="av" style="background:${n.color}">${n.icon}</div><div class="nm">${n.name}</div><span class="pill ${st}">${PILL[st] ?? "待機"}</span></div>
+      <div class="ds">${n.desc}</div>
+      <div class="wh">${esc(S.where[id] ?? n.where ?? "")}</div>
+      <div class="st">処理 <b>${S.count[id] ?? 0}</b> · 最終 <b>${S.last[id] ? hms(S.last[id]) : "–"}</b></div></div>`;
+  }
+  $("roster").innerHTML = html;
+}
+function esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]); }
+function hms(t) { return new Date(t).toTimeString().slice(0, 8); }
+
+function feed(at, tag, text, cls = "") {
+  S.feed++;
+  const d = document.createElement("div");
+  d.className = `ln ${cls}`;
+  d.innerHTML = `<time>${hms(at)}</time><div><span class="tag" style="color:${TAG_COLOR[tag] ?? "#ccc"}">[${tag}]</span>${esc(text)}</div>`;
+  $("feed").querySelector(".cmd").after(d);
+  $("ev-count").textContent = `${S.feed} 件`;
+}
+function fail(at, text) {
+  if (!S.fails.length) $("fails").innerHTML = "";
+  S.fails.push(text);
+  const d = document.createElement("div");
+  d.className = "f";
+  d.textContent = `${hms(at)} ${text}`;
+  $("fails").append(d);
+}
+
+// ---------- 粒子のアニメーション ----------
+// 経路を順に流れる。例 fly(["up", "ask"], C.amber)
+function fly(route, color, animate) {
+  if (!animate) return;
+  const id = route.shift();
+  const p = paths[id];
+  const len = p.getTotalLength();
+  const lab = $(`l-${id}`);
+  p.classList.add("hot"); p.style.stroke = color; lab.classList.add("hot");
+  const dots = [0, 1, 2].map((i) => el("circle", { r: 5 - i * 1.3, fill: color, opacity: 1 - i * 0.3 }, $("dots")));
+  const dur = 700 / Math.min(speed, 4);
+  const t0 = performance.now();
+  (function step(now) {
+    const k = (now - t0) / dur;
+    dots.forEach((d, i) => {
+      const pt = p.getPointAtLength(len * Math.max(0, Math.min(1, k - i * 0.06)));
+      d.setAttribute("cx", pt.x); d.setAttribute("cy", pt.y);
+    });
+    if (k < 1.12) return requestAnimationFrame(step);
+    dots.forEach((d) => d.remove());
+    setTimeout(() => { p.classList.remove("hot"); p.style.stroke = ""; lab.classList.remove("hot"); }, 500);
+    if (route.length) fly(route, color, animate);
+  })(t0);
+}
+
+// ---------- イベントの解釈 ----------
+function apply(e, animate) {
+  const at = e.at ?? Date.now();
+  const busy = (id, sub) => { setStatus(id, "run", sub); bump(id, at); };
+  const shot = (b64) => { if (b64) { $("shot").src = `data:image/jpeg;base64,${b64}`; $("shot").style.display = ""; $("shot-none").style.display = "none"; fly(["screen"], C.violet, animate); } };
+  switch (e.type) {
+    case "notice":
+      setStatus("person", "ok", "通知を撮影");
+      fly(["photo"], C.cyan, animate);
+      feed(at, "ご本人", "通知の写真を送りました");
+      break;
+    case "meta":
+      S.where.reader = e.reader;
+      S.where.agent = e.operator ?? e.reader;
+      S.sandboxLabel = e.sandbox;
+      if (e.viewer) { S.viewer = e.viewer; $("viewer").href = e.viewer; $("viewer").style.display = ""; setStatus("screen", "run", "noVNC ライブ中継"); }
+      break;
+    case "state":
+      S.phase = e.state;
+      if (e.state === "READING") { busy("reader", "通知を読んでいます"); busy("orch", "読み取りを依頼"); }
+      if (e.state === "SANDBOX_READY") { S.sandbox = "起動中"; busy("orch", "隔離マシンを準備"); }
+      if (e.state === "FILLING") { busy("agent", "画面を読んでいます"); setStatus("orch", "run", "進行を監視"); }
+      if (e.state === "ASKING") setStatus("agent", "wait", "回答待ち");
+      if (e.state === "CONFIRMING") setStatus("agent", "wait", "承認待ち");
+      if (e.state === "VERIFYING") { setStatus("agent", "ok", "送信済み"); setStatus("browser", "ok", "完了画面"); setStatus("site", "ok", "受付済み"); busy("verifier", "照合中"); fly(["check"], C.green, animate); }
+      if (e.state === "DONE") setStatus("orch", "ok", "完了");
+      feed(at, "司令", e.text);
+      break;
+    case "explain":
+      setStatus("reader", "ok", e.noticeType);
+      S.kpi.auto = e.sources.length;
+      fly(["explain"], C.amber, animate);
+      fly(["extract"], C.cyan, animate);
+      feed(at, "読み取り", `${e.noticeType}（期限 ${e.deadline ?? "記載なし"}）· ご本人の情報 ${e.sources.length} 項目`);
+      break;
+    case "action": {
+      const tag = AGENT_TAG[e.agent] ?? "司令";
+      if (e.agent === "sandbox") {
+        S.sandbox = "稼働中";
+        const m = e.text.match(/（([\d.]+) 秒）/); if (m) S.kpi.boot = m[1];
+        setStatus("browser", "run", "申請サイトを表示中");
+        setStatus("site", "run", "接続中");
+        fly(["boot"], C.cyan, animate);
+      }
+      if (e.agent === "operator") {
+        S.kpi.steps++; bump("agent", at); bump("browser", at);
+        setStatus("agent", "run", e.text.slice(0, 16));
+        setStatus("browser", "run", "操作中");
+        if (S.status.person === "wait") setStatus("person", "ok", "回答済み");
+        fly(["cmd", "fill"], C.cyan, animate);
+        fly(["obs"], C.violet, animate);
+      }
+      if (e.agent === "reader") S.where.reader = e.text;
+      shot(e.screenshot);
+      feed(at, tag, e.text);
+      break;
+    }
+    case "question":
+      S.kpi.ask++; bump("agent", at); S.labels = { ...S.labels, [e.fieldName]: e.label };
+      setStatus("agent", "wait", "質問中");
+      setStatus("person", "wait", "質問に回答中");
+      fly(["ask"], C.amber, animate);
+      shot(e.screenshot);
+      feed(at, "操作", `質問: ${e.text}`, "ask");
+      break;
+    case "answered":
+      setStatus("person", "ok", "回答済み");
+      setStatus("agent", "run", "回答を入力");
+      fly(["ans", "cmd"], C.amber, animate);
+      feed(at, "ご本人", `「${S.labels?.[e.fieldName] ?? e.fieldName}」に回答`, "ask");
+      break;
+    case "confirm":
+      setStatus("agent", "wait", "送信前の承認");
+      setStatus("person", "wait", "読み上げを確認中");
+      fly(["ask"], C.amber, animate);
+      shot(e.screenshot);
+      feed(at, "操作", `承認依頼: ${e.readout}`, "ask");
+      break;
+    case "verify":
+      S.kpi.exit = e.exitCode; bump("verifier", at);
+      setStatus("verifier", e.exitCode === 0 ? "ok" : "fail", `exit ${e.exitCode}`);
+      fly(["exit"], e.exitCode === 0 ? C.green : C.red, animate);
+      feed(at, "検証", `exit ${e.exitCode} · ${e.output.split("\n").pop()}`, e.exitCode === 0 ? "" : "err");
+      if (e.exitCode !== 0) fail(at, `照合で不一致（exit ${e.exitCode}）`);
+      break;
+    case "done":
+      feed(at, "司令", `番号 ${e.receiptNo}`);
+      break;
+    case "family":
+      setStatus("family", "ok", "報告済み");
+      fly(["family"], C.green, animate);
+      feed(at, "家族", e.text);
+      break;
+    case "cancelled":
+      setStatus("orch", "ok", "取り消し");
+      for (const id of ["agent", "person"]) if (S.status[id] === "wait") setStatus(id, "", "");
+      feed(at, "司令", e.text, "err");
+      fail(at, `中断: ${e.text}`);
+      break;
+    case "error": {
+      const who = ["agent", "browser", "verifier", "reader"].find((id) => S.status[id] === "run") ?? "orch";
+      setStatus(who, "fail", "失敗");
+      feed(at, "失敗", e.message, "err");
+      fail(at, `${NODES[who].name}: ${e.message}`);
+      break;
+    }
+    case "disposed":
+      S.sandbox = "破棄済み"; S.ended = true;
+      setStatus("screen", "", "");
+      feed(at, "Daytona", e.text);
+      break;
+  }
+  render();
+}
+
+// ---------- 再生 ----------
+// ライブは現在時刻に、再生は仮想時刻に合わせてイベントを流す。古いイベント（1.5 秒より前）は粒子を出さずに反映する
+let events = [], cursor = 0, speed = 1, mode = "live", vt = 0, lastTick = 0, es = null, runId = null;
+function t0() { return events[0]?.at ?? Date.now(); }
+function tick(now) {
+  const dt = now - (lastTick || now); lastTick = now;
+  if (mode === "live") vt = Date.now() - t0();
+  else vt += dt * speed;
+  while (cursor < events.length && events[cursor].at - t0() <= vt) {
+    const e = events[cursor++];
+    apply(e, vt - (e.at - t0()) < 1500 * Math.max(1, speed));
+  }
+  const end = S.ended && events.length ? events.at(-1).at - t0() : null;
+  const shown = Math.max(0, end != null ? Math.min(vt, end) : vt);
+  $("k-time").textContent = events.length ? `${String(Math.floor(shown / 60000)).padStart(2, "0")}:${String(Math.floor(shown / 1000) % 60).padStart(2, "0")}` : "--:--";
+  requestAnimationFrame(tick);
+}
+function follow(id) {
+  if (id === runId) return;
+  es?.close();
+  runId = id; events = []; cursor = 0; vt = 0;
+  reset();
+  $("empty").style.display = "none";
+  $("run-id").textContent = `run ${id.slice(0, 8)}`;
+  es = new EventSource(`/api/runs/${id}/events`);
+  es.onmessage = (m) => { const e = JSON.parse(m.data); e.at ??= Date.now(); events.push(e); };
+}
+function setMode(m) {
+  mode = m;
+  $("live").classList.toggle("on", m === "live");
+  if (m === "replay") { cursor = 0; vt = 0; reset(); }
+  else { cursor = 0; reset(); }
+}
+$("live").onclick = () => setMode("live");
+$("replay").onclick = () => setMode("replay");
+document.querySelectorAll("[data-speed]").forEach((b) => b.onclick = () => {
+  speed = Number(b.dataset.speed);
+  document.querySelectorAll("[data-speed]").forEach((x) => x.classList.toggle("on", x === b));
+});
+$("runs").onchange = () => { if ($("runs").value) { setMode("live"); follow($("runs").value); } };
+
+// 新しい実行が始まったら自動で切り替える
+let known = 0;
+async function poll() {
+  try {
+    const list = await (await fetch("/api/runs")).json();
+    if (list.length) {
+      $("runs").innerHTML = list.slice().reverse().map((r) => `<option value="${r.id}">${hms(r.startedAt)} · ${r.id.slice(0, 8)} · ${esc(r.state ?? "開始")}</option>`).join("");
+      if (list.length !== known) { known = list.length; setMode("live"); follow(list.at(-1).id); }
+      $("runs").value = runId;
+    }
+  } catch {}
+  setTimeout(poll, 2000);
+}
+
+buildMap();
+reset();
+requestAnimationFrame(tick);
+poll();
+</script>
+</body>
+</html>

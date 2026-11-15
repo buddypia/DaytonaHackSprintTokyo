@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>おまかせ手続き</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23c4532d'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='white'%3E%E3%81%8A%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --paper: #f7f3ea; --card: #fffdf8; --ink: #23201b; --muted: #6d665b; --line: #e3dccd;
+    --accent: #c4532d; --accent-soft: #fbe9e1; --ok: #2f7d4f; --ok-soft: #e3f2e8; --navy: #1f3b57;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif; }
+  header { display: flex; align-items: center; gap: 16px; padding: 16px 32px; border-bottom: 1px solid var(--line); background: var(--card); }
+  .mark { width: 44px; height: 44px; border-radius: 12px; background: var(--accent); color: #fff; display: grid; place-items: center; font-size: 24px; font-weight: 700; }
+  header h1 { margin: 0; font-size: 24px; letter-spacing: .04em; }
+  header p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+  .chips { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .chip { font-size: 12px; padding: 5px 10px; border-radius: 999px; background: #efe9dc; color: var(--muted); white-space: nowrap; }
+  .chip b { color: var(--ink); font-weight: 600; }
+  main { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 24px; padding: 24px 32px 40px; max-width: 1440px; margin: 0 auto; }
+  section h2 { font-size: 14px; color: var(--muted); font-weight: 600; margin: 0 0 12px; letter-spacing: .08em; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 26px 28px; margin-bottom: 18px; box-shadow: 0 1px 0 rgba(0,0,0,.03); }
+  .hidden { display: none !important; }
+  .big { font-size: 30px; font-weight: 700; line-height: 1.45; margin: 0 0 18px; }
+  .btns { display: flex; gap: 14px; flex-wrap: wrap; }
+  button, .file { font: inherit; border: 0; border-radius: 16px; cursor: pointer; min-height: 72px; padding: 0 30px; font-size: 22px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
+  .primary { background: var(--accent); color: #fff; }
+  .secondary { background: #efe9dc; color: var(--ink); }
+  .yes { background: var(--ok); color: #fff; min-width: 220px; font-size: 28px; }
+  .no { background: #efe9dc; color: var(--ink); min-width: 160px; }
+  button:disabled { opacity: .5; cursor: default; }
+  .file input { display: none; }
+  .notice-thumb { display: flex; gap: 18px; align-items: center; }
+  .notice-thumb img { width: 120px; border-radius: 8px; border: 1px solid var(--line); }
+  .kind { display: inline-block; background: var(--accent-soft); color: var(--accent); font-weight: 700; padding: 6px 12px; border-radius: 8px; font-size: 16px; margin-bottom: 14px; }
+  ol.three { list-style: none; padding: 0; margin: 0; counter-reset: n; }
+  ol.three li { counter-increment: n; display: grid; grid-template-columns: 44px 1fr; gap: 12px; font-size: 26px; line-height: 1.5; padding: 10px 0; border-bottom: 1px dashed var(--line); }
+  ol.three li:last-child { border-bottom: 0; }
+  ol.three li::before { content: counter(n); width: 38px; height: 38px; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; font-size: 20px; font-weight: 700; margin-top: 4px; }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+  .link { background: none; min-height: 0; padding: 6px 0; font-size: 16px; color: var(--navy); text-decoration: underline; font-weight: 600; }
+  details { margin-top: 10px; color: var(--muted); font-size: 14px; }
+  details li { margin: 4px 0; }
+  .status { display: flex; align-items: center; gap: 14px; font-size: 22px; font-weight: 600; }
+  .spin { width: 26px; height: 26px; border-radius: 50%; border: 4px solid #e5dccb; border-top-color: var(--accent); animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .q { border: 3px solid var(--accent); }
+  .q .label { color: var(--accent); font-weight: 700; font-size: 16px; margin-bottom: 6px; }
+  .q .hint { color: var(--muted); font-size: 16px; margin: -6px 0 14px; cursor: pointer; }
+  .q-input { font: inherit; font-size: 24px; padding: 14px 16px; border: 2px solid var(--line); border-radius: 14px; flex: 1 1 260px; min-height: 72px; background: #fff; }
+  .confirm { border: 3px solid var(--ok); }
+  .done { background: var(--ok-soft); border-color: #bcdcc8; text-align: center; }
+  .done .no-label { color: var(--muted); font-size: 16px; margin: 0; }
+  .done .receipt { font-size: 40px; font-weight: 800; letter-spacing: .06em; margin: 4px 0 10px; color: var(--ok); }
+  .err { background: #fdecec; border-color: #f0c4c4; color: #8a1f1f; font-size: 18px; }
+  .screen { background: #1d232b; border-radius: 14px; padding: 10px; }
+  .screen .bar { display: flex; align-items: center; gap: 6px; color: #aeb8c4; font-size: 12px; padding: 2px 4px 8px; }
+  .screen .dot { width: 9px; height: 9px; border-radius: 50%; background: #4a5561; }
+  .screen .live { margin-left: auto; color: #ff8a65; font-weight: 700; }
+  .screen iframe { width: 100%; aspect-ratio: 16 / 10; border: 0; border-radius: 6px; background: #000; display: block; }
+  .screen img { width: 100%; display: block; border-radius: 6px; background: #fff; min-height: 220px; }
+  .empty { color: #8996a3; display: grid; place-items: center; min-height: 260px; font-size: 14px; }
+  .timeline { list-style: none; margin: 16px 0 0; padding: 0; max-height: 360px; overflow: auto; }
+  .timeline li { display: grid; grid-template-columns: 64px 1fr; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; line-height: 1.5; }
+  .timeline time { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .timeline .s { font-weight: 700; color: var(--navy); }
+  pre.verify { background: #1d232b; color: #d9f2e1; padding: 14px 16px; border-radius: 12px; font-size: 13px; line-height: 1.6; white-space: pre-wrap; margin: 0; }
+  pre.verify.bad { color: #ffd0c8; }
+  .exit { font-family: ui-monospace, Menlo, monospace; font-weight: 700; }
+  .family { display: flex; gap: 14px; align-items: flex-start; }
+  .family .icon { flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; font-weight: 700; }
+  .family p { margin: 0; font-size: 15px; line-height: 1.7; }
+  @media (max-width: 980px) { main { grid-template-columns: 1fr; padding: 16px; } header { padding: 14px 16px; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="mark">お</div>
+  <div>
+    <h1>おまかせ手続き</h1>
+    <p>届いた通知を撮るだけ。AI が隔離されたパソコンで、手続きを代わりに済ませます</p>
+  </div>
+  <div class="chips">
+    <span class="chip">隔離実行 <b id="chip-sandbox">—</b></span>
+    <span class="chip">読み取り <b id="chip-reader">—</b></span>
+    <a class="chip" href="/ops" target="_blank" style="text-decoration:none">裏側を見る ↗</a>
+  </div>
+</header>
+
+<main>
+  <section aria-label="ご本人の画面">
+    <h2>ご本人の画面</h2>
+
+    <div class="card" id="start">
+      <p class="big">届いた通知や書類を、撮影してください</p>
+      <div class="btns">
+        <label class="file primary">📷 写真を撮る・選ぶ<input id="photo" type="file" accept="image/*" capture="environment"></label>
+        <button class="secondary" id="sample">見本の請求書で試す</button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="notice">
+      <div class="notice-thumb"><img id="notice-img" alt="受け取った通知"><div class="status"><span>通知を受け取りました</span></div></div>
+    </div>
+
+    <div class="card hidden" id="explain">
+      <span class="kind" id="kind"></span>
+      <ol class="three" id="three"></ol>
+      <div class="row">
+        <button class="link" id="again">🔊 もう一度読み上げる</button>
+      </div>
+      <details><summary>通知のどこを読んだか（原文）</summary><ul id="sources"></ul></details>
+    </div>
+
+    <div class="card hidden" id="working"><div class="status"><span class="spin"></span><span id="working-text"></span></div></div>
+
+    <div class="card q hidden" id="question">
+      <div class="label">ひとつ教えてください</div>
+      <p class="big" id="q-text"></p>
+      <p class="hint hidden" id="q-hint"></p>
+      <div class="btns" id="q-choices"></div>
+      <form class="btns hidden" id="q-form"><input class="q-input" id="q-input" autocomplete="off"><button class="primary" type="submit">これで答える</button></form>
+      <div class="row"><button class="link hidden" id="q-voice">🎤 声で答える</button><span id="q-heard" style="color:var(--muted)"></span></div>
+    </div>
+
+    <div class="card confirm hidden" id="confirm">
+      <p class="big" id="c-text"></p>
+      <div class="btns"><button class="yes" id="c-yes">はい</button><button class="no" id="c-no">いいえ</button></div>
+    </div>
+
+    <div class="card done hidden" id="done">
+      <p class="big" style="margin-bottom:6px">手続きが終わりました</p>
+      <p class="no-label">整理番号</p>
+      <p class="receipt" id="receipt"></p>
+      <p id="done-check" style="margin:0;font-size:18px"></p>
+    </div>
+
+    <div class="card hidden" id="ended"><p class="big" id="ended-text" style="margin:0"></p></div>
+    <div class="card err hidden" id="error"></div>
+  </section>
+
+  <section aria-label="見守り画面">
+    <h2>見守り画面（ご家族）</h2>
+    <div class="card">
+      <div class="screen">
+        <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span id="screen-label">隔離マシンの画面</span><span class="live hidden" id="live">● LIVE</span></div>
+        <iframe id="desktop" class="hidden" title="隔離マシンのデスクトップ（ライブ）"></iframe>
+        <img id="shot" class="hidden" alt="AI が操作している申請サイトの画面">
+        <div class="empty" id="shot-empty">手続きが始まると、AI が申請サイトを操作する様子がここに映ります</div>
+      </div>
+      <ul class="timeline" id="timeline"></ul>
+    </div>
+    <div class="card hidden" id="verify-card">
+      <h2 style="margin-bottom:10px">送信内容と通知の照合 <span class="exit" id="exit"></span></h2>
+      <pre class="verify" id="verify"></pre>
+    </div>
+    <div class="card hidden" id="family-card">
+      <div class="family"><div class="icon">家</div><div><h2 style="margin:0 0 6px">ご家族への通知</h2><p id="family"></p></div></div>
+    </div>
+  </section>
+</main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const show = (id, on = true) => $(id).classList.toggle("hidden", !on);
+  let runId = null;
+  let lastSummary = "";
+  let liveDesktop = false; // 隔離マシンの画面をライブで映しているあいだは、スクリーンショットは時系列にだけ使う
+
+  // 読み上げ（ブラウザの音声合成）
+  function speak(text) {
+    if (!("speechSynthesis" in window)) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "ja-JP";
+    u.rate = 0.95;
+    const v = speechSynthesis.getVoices().find((v) => v.lang === "ja-JP");
+    if (v) u.voice = v;
+    speechSynthesis.speak(u);
+  }
+
+  function log(text, strong = false) {
+    const li = document.createElement("li");
+    const t = new Date().toLocaleTimeString("ja-JP", { hour12: false });
+    li.innerHTML = `<time>${t}</time><span class="${strong ? "s" : ""}"></span>`;
+    li.querySelector("span").textContent = text;
+    $("timeline").prepend(li);
+  }
+
+  function working(text) {
+    $("working-text").textContent = text;
+    show("working", !!text);
+  }
+
+  function setShot(b64) {
+    if (!b64 || liveDesktop) return;
+    $("shot").src = `data:image/jpeg;base64,${b64}`;
+    show("shot");
+    show("shot-empty", false);
+  }
+
+  async function post(path, body) {
+    const res = await fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error);
+    return json;
+  }
+
+  async function begin(body) {
+    $("sample").disabled = true;
+    show("start", false);
+    speak("通知をお預かりしました。読んでいます。");
+    const { runId: id } = await post("/api/runs", body);
+    runId = id;
+    const es = new EventSource(`/api/runs/${id}/events`);
+    es.onmessage = (m) => handle(JSON.parse(m.data), es);
+  }
+
+  function handle(e, es) {
+    switch (e.type) {
+      case "meta":
+        $("chip-sandbox").textContent = e.sandbox;
+        $("chip-reader").textContent = e.reader;
+        $("screen-label").textContent = `${e.sandbox} の画面`;
+        if (e.viewer && !liveDesktop) {
+          liveDesktop = true;
+          $("desktop").src = e.viewer;
+          show("desktop");
+          show("shot", false);
+          show("shot-empty", false);
+          show("live");
+        }
+        break;
+      case "disposed":
+        log(e.text, true);
+        if (liveDesktop) {
+          liveDesktop = false;
+          $("desktop").src = "about:blank";
+          show("desktop", false);
+          $("shot-empty").textContent = "隔離マシンは破棄されました。個人情報は残っていません";
+          show("shot-empty");
+          show("live", false);
+        }
+        es.close();
+        break;
+      case "notice":
+        $("notice-img").src = e.image;
+        show("notice");
+        break;
+      case "state":
+        log(e.text, true);
+        working(["ASKING", "CONFIRMING", "DONE"].includes(e.state) ? "" : e.text + "…");
+        if (!liveDesktop) show("live", ["FILLING", "ASKING", "CONFIRMING"].includes(e.state));
+        break;
+      case "explain": {
+        $("kind").textContent = e.noticeType;
+        $("three").innerHTML = "";
+        for (const line of e.summary) {
+          const li = document.createElement("li");
+          li.textContent = line;
+          $("three").append(li);
+        }
+        $("sources").innerHTML = "";
+        for (const s of e.sources) {
+          const li = document.createElement("li");
+          li.textContent = `${s.label}: 「${s.sourceText}」`;
+          $("sources").append(li);
+        }
+        show("notice", false);
+        show("explain");
+        lastSummary = e.summary.join("。");
+        speak(lastSummary + "。このあと、申請の入力を代わりに進めます。");
+        log(`読み取り: ${e.noticeType}（期限 ${e.deadline ?? "記載なし"}）`);
+        break;
+      }
+      case "action":
+        setShot(e.screenshot);
+        log(e.text);
+        break;
+      case "question":
+        setShot(e.screenshot);
+        askQuestion(e);
+        log(`質問: ${e.text}`, true);
+        break;
+      case "answered":
+        show("question", false);
+        working("回答を入力しています…");
+        break;
+      case "confirm":
+        setShot(e.screenshot);
+        $("c-text").textContent = e.readout;
+        show("confirm");
+        speak(e.readout);
+        break;
+      case "verify":
+        $("verify").textContent = e.output;
+        $("verify").classList.toggle("bad", e.exitCode !== 0);
+        $("exit").textContent = `exit ${e.exitCode}`;
+        $("exit").style.color = e.exitCode === 0 ? "var(--ok)" : "var(--accent)";
+        show("verify-card");
+        log(`照合: exit ${e.exitCode}`, true);
+        break;
+      case "done":
+        working("");
+        show("confirm", false);
+        $("receipt").textContent = e.receiptNo;
+        $("done-check").textContent = e.verifyExitCode === 0 ? "✔ 入力した内容がすべて申請サイトに受け付けられたことを、確認画面で確かめました" : "⚠ 照合で不一致がありました。ご家族と確認してください";
+        show("done");
+        speak(/^\d+$/.test(e.receiptNo) ? `手続きが終わりました。整理番号は ${e.receiptNo.split("").join(" ")} です。` : "手続きが終わりました。");
+        break;
+      case "family":
+        $("family").textContent = e.text;
+        show("family-card");
+        log("ご家族に通知しました");
+        break;
+      case "cancelled":
+        working("");
+        show("confirm", false);
+        show("question", false);
+        $("ended-text").textContent = e.text;
+        show("ended");
+        speak(e.text);
+        log(e.text, true);
+        break;
+      case "error":
+        working("");
+        $("error").textContent = `うまくいきませんでした: ${e.message}`;
+        show("error");
+        log(`エラー: ${e.message}`, true);
+        break;
+    }
+  }
+
+  function askQuestion(e) {
+    $("q-text").textContent = e.text;
+    $("q-choices").innerHTML = "";
+    for (const c of e.choices ?? []) {
+      const b = document.createElement("button");
+      b.className = "primary";
+      b.textContent = c;
+      b.onclick = () => answer(e.fieldName, c);
+      $("q-choices").append(b);
+    }
+    // 選択肢の無い質問は、文字（日付・電話番号・数字）で答える
+    const free = !e.choices?.length;
+    show("q-form", free);
+    $("q-form").querySelector("button").disabled = false;
+    $("q-input").type = { date: "date", tel: "tel", number: "number" }[e.inputType] ?? "text";
+    $("q-input").value = "";
+    $("q-input").placeholder = e.hint ? `例）${e.hint}` : "";
+    $("q-form").onsubmit = (ev) => {
+      ev.preventDefault();
+      const v = $("q-input").value.trim();
+      if (v) answer(e.fieldName, v);
+    };
+    $("q-hint").textContent = e.hint ? `入力例「${e.hint}」${free ? "（押すと入力欄に入ります）" : ""}` : "";
+    $("q-hint").onclick = () => free && e.hint && ($("q-input").value = e.hint);
+    show("q-hint", !!e.hint);
+    $("q-heard").textContent = "";
+    show("q-voice", !!(window.SpeechRecognition || window.webkitSpeechRecognition) && e.inputType !== "date");
+    $("q-voice").onclick = () => listen(e);
+    working("");
+    show("question");
+    if (free) $("q-input").focus();
+    speak(e.text + (e.choices?.length ? `　${e.choices.join("、または、")}、でお答えください。` : ""));
+  }
+
+  // 声で答える（ブラウザの音声認識。使えない環境ではボタンで答える）
+  function listen(e) {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const rec = new SR();
+    rec.lang = "ja-JP";
+    $("q-heard").textContent = "聞いています…";
+    rec.onresult = (r) => {
+      const said = r.results[0][0].transcript;
+      $("q-heard").textContent = `「${said}」`;
+      if (!e.choices?.length) return void ($("q-input").value = said); // 自由入力は聞き取った文を入れて、確かめてから答えてもらう
+      const hit = e.choices.find((c) => said.includes(c)) ??
+        (/(変わりない|変わらない|同じ|いいえ|ない)/.test(said) ? e.choices[0] : /(変わった|あった|変更|はい)/.test(said) ? e.choices[1] : null);
+      if (hit) answer(e.fieldName, hit);
+      else $("q-heard").textContent += " — 聞き取れませんでした。ボタンでお答えください";
+    };
+    rec.onerror = () => ($("q-heard").textContent = "聞き取れませんでした。ボタンでお答えください");
+    rec.start();
+  }
+
+  async function answer(fieldName, value) {
+    document.querySelectorAll("#q-choices button, #q-form button").forEach((b) => (b.disabled = true));
+    log(`回答: ${value}`);
+    await post(`/api/runs/${runId}/answer`, { fieldName, value }).catch((err) => alertError(err));
+  }
+
+  async function confirmSend(ok) {
+    $("c-yes").disabled = $("c-no").disabled = true;
+    show("confirm", false);
+    working(ok ? "送信しています…" : "");
+    log(ok ? "ご本人: はい" : "ご本人: いいえ", true);
+    await post(`/api/runs/${runId}/confirm`, { ok }).catch((err) => alertError(err));
+  }
+
+  function alertError(err) {
+    $("error").textContent = err.message;
+    show("error");
+  }
+
+  $("sample").onclick = () => begin({ fixture: true }).catch(alertError);
+  $("photo").onchange = () => {
+    const file = $("photo").files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => begin({ image: reader.result }).catch(alertError);
+    reader.readAsDataURL(file);
+  };
+  $("again").onclick = () => speak(lastSummary);
+  $("c-yes").onclick = () => confirmSend(true);
+  $("c-no").onclick = () => confirmSend(false);
+</script>
+</body>
+</html>

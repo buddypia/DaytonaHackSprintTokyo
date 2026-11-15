@@ -1,0 +1,253 @@
+<!-- ============================ 09 APPROVAL ============================ -->
+<section class="slide">
+  <div class="eyebrow"><span class="n">09</span><span>The seal</span></div>
+  <h2>It cannot press the last button. <em>Only you can.</em></h2>
+  <div class="ja">送信の直前に、入力内容を「出どころ」ごとに読み上げます。本人が「はい」と言ったときだけ送信します。</div>
+
+  <div style="display:flex; gap:36px; margin-top:26px">
+    <!-- phone -->
+    <div style="width:392px; border:1px solid var(--ink); background:#fff; padding:18px 20px 20px">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); padding-bottom:9px">
+        <div class="mono" style="font-size:9px; letter-spacing:.12em; color:var(--ink-3)">READ-BACK · 読み上げ</div>
+        <div class="mono" style="font-size:9px; color:var(--red)">WAITING</div>
+      </div>
+      <div style="font-size:14.5px; line-height:1.75; margin-top:12px">
+        「水道料金の口座振替を、<br>この内容で申し込みます。」
+      </div>
+      <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px; font-size:12px">
+        <div style="display:flex; gap:8px; align-items:baseline">
+          <span style="width:6px;height:6px;background:var(--blue);border-radius:50%;flex:none;margin-top:5px"></span>
+          <span><b>お客様番号</b> 1234567890 <span style="color:var(--blue);font-size:10px">書類</span></span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:baseline">
+          <span style="width:6px;height:6px;background:var(--blue);border-radius:50%;flex:none;margin-top:5px"></span>
+          <span><b>生年月日</b> 昭和 23 年 4 月 12 日 <span style="color:var(--blue);font-size:10px">書類</span></span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:baseline">
+          <span style="width:6px;height:6px;background:var(--gold);border-radius:50%;flex:none;margin-top:5px"></span>
+          <span><b>金融機関</b> ひばり野銀行 本店 <span style="color:#8A6716;font-size:10px">あなたの回答</span></span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:baseline">
+          <span style="width:6px;height:6px;background:var(--green);border-radius:50%;flex:none;margin-top:5px"></span>
+          <span><b>連絡先</b> family@example.com <span style="color:var(--green);font-size:10px">ご家族の設定</span></span>
+        </div>
+      </div>
+      <div style="margin-top:14px; font-size:13px">よろしいですか？</div>
+      <div style="display:flex; gap:10px; margin-top:12px">
+        <div style="flex:1; height:58px; background:var(--red); color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700">はい</div>
+        <div style="flex:1; height:58px; border:1.5px solid var(--ink); display:flex; align-items:center; justify-content:center; font-size:18px">いいえ</div>
+      </div>
+      <div style="margin-top:9px; font-size:9.5px; color:var(--ink-3); text-align:center">buttons ≥ 64px · type ≥ 24px on the real screen</div>
+    </div>
+
+    <!-- gate -->
+    <div style="flex:1">
+      <div class="kicker" style="margin-bottom:8px">THE GATE IS IN CODE, BEFORE THE CLICK</div>
+      <svg width="640" height="290" viewBox="0 0 640 290">
+        <defs>
+          <marker id="g-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="#15171B"/>
+          </marker>
+        </defs>
+
+        <rect x="0" y="24" width="196" height="62" fill="#fff" stroke="#15171B" stroke-width="1.3"/>
+        <text x="14" y="46" font-size="9" letter-spacing="1.3" fill="#7A8089">AGENT PROPOSES</text>
+        <text x="14" y="66" font-size="11.5" fill="#15171B">“submit” on 「この内容で申し込む」</text>
+
+        <line x1="200" y1="55" x2="238" y2="55" stroke="#15171B" stroke-width="1.3" marker-end="url(#g-ar)"/>
+
+        <rect x="244" y="14" width="150" height="82" fill="var(--red-soft)" stroke="#BF3A2B" stroke-width="1.5"/>
+        <text x="258" y="36" font-size="9" letter-spacing="1.3" fill="#BF3A2B">THE GATE</text>
+        <text x="258" y="56" font-size="11" fill="#15171B">snapshot confirm page</text>
+        <text x="258" y="72" font-size="11" fill="#15171B">read back by origin</text>
+        <text x="258" y="88" font-size="11" fill="#15171B">wait for a human</text>
+
+        <line x1="398" y1="55" x2="436" y2="55" stroke="#BF3A2B" stroke-width="1.5" marker-end="url(#g-ar)"/>
+
+        <!-- yes -->
+        <rect x="442" y="0" width="196" height="60" fill="#fff" stroke="#1D6A58" stroke-width="1.4"/>
+        <text x="456" y="20" font-size="9" letter-spacing="1.3" fill="#1D6A58">IF “YES”</text>
+        <text x="456" y="38" font-size="11" fill="#15171B">click → submit → receipt</text>
+        <text x="456" y="52" font-size="10" fill="#4C525C">the only path that writes</text>
+
+        <!-- no -->
+        <rect x="442" y="86" width="196" height="60" fill="#fff" stroke="#BF3A2B" stroke-width="1.4"/>
+        <text x="456" y="106" font-size="9" letter-spacing="1.3" fill="#BF3A2B">IF “NO”</text>
+        <text x="456" y="124" font-size="11" fill="#15171B">return, send nothing</text>
+        <text x="456" y="138" font-size="10" fill="#4C525C">no partial application</text>
+
+        <line x1="517" y1="60" x2="517" y2="82" stroke="#15171B" stroke-width="1.1" stroke-dasharray="3 3"/>
+
+        <!-- family -->
+        <line x1="0" y1="128" x2="640" y2="128" stroke="#D5CDBB"/>
+
+        <rect x="0" y="152" width="332" height="126" fill="#fff" stroke="#15171B" stroke-width="1.3"/>
+        <text x="14" y="174" font-size="9" letter-spacing="1.3" fill="#7A8089">FAMILY VIEW · READ-ONLY</text>
+        <text x="14" y="196" font-size="11.5" fill="#15171B">Daytona signed preview URL → noVNC</text>
+        <text x="14" y="214" font-size="10.5" fill="#4C525C">view_only=true · 1-hour expiry · one errand</text>
+        <text x="14" y="232" font-size="10.5" fill="#4C525C">Watch the machine fill the form live.</text>
+        <text x="14" y="256" font-size="10" fill="#BF3A2B">They can watch. They cannot type.</text>
+
+        <rect x="348" y="152" width="292" height="126" fill="#171B22" stroke="#2E3644"/>
+        <text x="362" y="174" font-size="9" letter-spacing="1.3" fill="#98A2B2">WHAT DOES NOT EXIST</text>
+        <g font-size="10.5" fill="#DCE3EC">
+          <text x="362" y="198">✘ a password field for the family</text>
+          <text x="362" y="218">✘ a stored login on the phone</text>
+          <text x="362" y="238">✘ a “skip confirmation” flag</text>
+          <text x="362" y="258">✘ a model with a shell</text>
+        </g>
+      </svg>
+
+      <div style="display:flex; gap:20px; margin-top:16px">
+        <div style="flex:1; font-size:10.5px; color:var(--ink-2); line-height:1.5">
+          <b style="color:var(--ink)">Consent is not a checkbox.</b> The person hears the values, grouped by where they came from — not a wall of fields.
+        </div>
+        <div style="flex:1; font-size:10.5px; color:var(--ink-2); line-height:1.5">
+          <b style="color:var(--ink)">Declining is a first-class outcome.</b> “No” ends the run as <span class="mono">CANCELLED</span>, with nothing submitted and the sandbox destroyed.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot"><span>One irreversible step, one human decision</span><span>09 / 15</span></div>
+</section>
+
+<!-- ============================ 10 VERIFICATION ============================ -->
+<section class="slide">
+  <div class="eyebrow"><span class="n">10</span><span>Proof</span></div>
+  <h2>Then it proves the filing — <em>without asking a model.</em></h2>
+  <div class="ja">送信後に、申請サイト自身の画面と入力記録を突き合わせます。合否はモデルではなく終了コードです。</div>
+
+  <div style="display:flex; gap:26px; margin-top:26px">
+    <!-- artifacts -->
+    <div style="width:300px">
+      <div class="kicker" style="margin-bottom:9px">FOUR ARTIFACTS IN THE SANDBOX</div>
+      <div style="border:1px solid var(--ink); background:#fff; padding:10px 12px; margin-bottom:8px">
+        <div class="mono" style="font-size:9.5px">expected.json</div>
+        <div style="font-size:10px; color:var(--ink-2); margin-top:3px">What the agent typed, and from which source.</div>
+      </div>
+      <div style="border:1px solid var(--ink); background:#fff; padding:10px 12px; margin-bottom:8px">
+        <div class="mono" style="font-size:9.5px">confirm-page.txt</div>
+        <div style="font-size:10px; color:var(--ink-2); margin-top:3px">The portal’s own view, saved just before submit.</div>
+      </div>
+      <div style="border:1px solid var(--ink); background:#fff; padding:10px 12px; margin-bottom:8px">
+        <div class="mono" style="font-size:9.5px">done-page.txt</div>
+        <div style="font-size:10px; color:var(--ink-2); margin-top:3px">The receipt screen after submission.</div>
+      </div>
+      <div style="border:1px solid var(--ink); background:#fff; padding:10px 12px">
+        <div class="mono" style="font-size:9.5px">site-received.json</div>
+        <div style="font-size:10px; color:var(--ink-2); margin-top:3px">What the portal actually stored, server-side.</div>
+      </div>
+      <div style="font-size:9.5px; color:var(--ink-3); margin-top:10px; line-height:1.5">TXT snapshots are produced by the browser step; the JSON is written by the orchestrator.</div>
+    </div>
+
+    <!-- checks -->
+    <div style="flex:1">
+      <div class="kicker" style="margin-bottom:9px">THE VERIFIER’S CHECKS — NO MODEL, NO NETWORK</div>
+      <div style="border:1px solid var(--ink); background:#fff">
+        <div style="padding:9px 14px; border-bottom:1px solid var(--line); font-size:11px"><span style="color:var(--green)">✔</span> &nbsp;A confirmation page was captured before submit</div>
+        <div style="padding:9px 14px; border-bottom:1px solid var(--line); font-size:11px"><span style="color:var(--green)">✔</span> &nbsp;Every typed value appears on the portal’s confirmation page</div>
+        <div style="padding:9px 14px; border-bottom:1px solid var(--line); font-size:11px"><span style="color:var(--green)">✔</span> &nbsp;Every typed value has a recorded origin</div>
+        <div style="padding:9px 14px; border-bottom:1px solid var(--line); font-size:11px"><span style="color:var(--green)">✔</span> &nbsp;No document field was skipped without a stated reason</div>
+        <div style="padding:9px 14px; border-bottom:1px solid var(--line); font-size:11px"><span style="color:var(--green)">✔</span> &nbsp;The page after submit says “accepted / complete”</div>
+        <div style="padding:9px 14px; border-bottom:1px solid var(--line); font-size:11px"><span style="color:var(--green)">✔</span> &nbsp;The reported receipt number appears on that page</div>
+        <div style="padding:9px 14px; font-size:11px"><span style="color:var(--green)">✔</span> &nbsp;Server-side values and receipt number match the client record</div>
+      </div>
+
+      <div style="display:flex; gap:22px; margin-top:18px; align-items:flex-start">
+        <div style="flex:1; font-size:10.5px; color:var(--ink-2); line-height:1.55">
+          <b style="color:var(--ink)">Why a second opinion matters:</b> the agent could hallucinate a success screen. The verifier only reads files the portal produced, so a wrong answer fails loudly instead of quietly.
+        </div>
+        <div style="width:196px; border:1px solid var(--green); background:var(--green-soft); padding:12px 14px">
+          <div class="mono" style="font-size:8.5px; letter-spacing:.14em; color:var(--green)">VERDICT</div>
+          <div class="mono" style="font-size:26px; font-weight:700; color:var(--green); margin-top:4px">exit 0</div>
+          <div style="font-size:9.5px; color:var(--green); margin-top:2px">any ✘ → exit 1 → run fails</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="position:absolute; left:72px; bottom:74px; right:72px; display:flex; align-items:center; gap:16px; border-top:1px solid var(--line); padding-top:14px">
+    <div class="mono" style="font-size:9px; letter-spacing:.14em; color:var(--ink-3)">IMPLEMENTATION</div>
+    <div style="font-size:11px; color:var(--ink-2); line-height:1.5">One plain-JS file, no dependencies, no network. It prints a pass/fail line per check — a judge can read the verdict in the terminal during the demo.</div>
+    <div style="margin-left:auto; font-size:10px; color:var(--ink-3)" class="mono">sandbox/verify/verify.mjs</div>
+  </div>
+
+  <div class="foot"><span>The success criterion is a file the portal wrote, not a sentence the model wrote</span><span>10 / 15</span></div>
+</section>
+
+<!-- ============================ 11 PRIVACY ============================ -->
+<section class="slide">
+  <div class="eyebrow"><span class="n">11</span><span>Blast radius</span></div>
+  <h2>The photo never leaves <em>the room.</em></h2>
+  <div class="ja">個人情報は、自分で選んだ推論基盤と、依頼ごとの隔離マシンの外に出ません。</div>
+
+  <svg width="1136" height="250" viewBox="0 0 1136 250" style="margin-top:32px">
+    <defs>
+      <marker id="p-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="#15171B"/>
+      </marker>
+    </defs>
+
+    <rect x="0" y="34" width="176" height="96" fill="#fff" stroke="#15171B" stroke-width="1.3"/>
+    <text x="14" y="56" font-size="9" letter-spacing="1.3" fill="#7A8089">1 · CAPTURE</text>
+    <text x="14" y="80" font-size="11.5" fill="#15171B">A phone photo of</text>
+    <text x="14" y="96" font-size="11.5" fill="#15171B">a paper notice</text>
+    <text x="14" y="118" font-size="9.5" fill="#4C525C">name, address, numbers</text>
+
+    <line x1="180" y1="82" x2="222" y2="82" stroke="#15171B" stroke-width="1.3" marker-end="url(#p-ar)"/>
+
+    <rect x="226" y="20" width="230" height="124" fill="var(--green-soft)" stroke="#1D6A58" stroke-width="1.4"/>
+    <text x="240" y="42" font-size="9" letter-spacing="1.3" fill="#1D6A58">2 · YOUR INFERENCE</text>
+    <text x="240" y="66" font-size="11.5" fill="#15171B">Nosana GPU (self-hosted VLM)</text>
+    <text x="240" y="84" font-size="11.5" fill="#15171B">or your own Vertex project</text>
+    <text x="240" y="108" font-size="9.5" fill="#1D6A58">no commercial vision API</text>
+    <text x="240" y="126" font-size="9.5" fill="#4C525C">you choose the endpoint</text>
+
+    <line x1="460" y1="82" x2="502" y2="82" stroke="#15171B" stroke-width="1.3" marker-end="url(#p-ar)"/>
+
+    <rect x="506" y="20" width="286" height="124" fill="#fff" stroke="#15171B" stroke-width="1.3"/>
+    <text x="520" y="42" font-size="9" letter-spacing="1.3" fill="#7A8089">3 · THE SANDBOX</text>
+    <text x="520" y="66" font-size="11.5" fill="#15171B">Portal session, typed values,</text>
+    <text x="520" y="84" font-size="11.5" fill="#15171B">confirm + receipt snapshots</text>
+    <text x="520" y="108" font-size="9.5" fill="#4C525C">no host mounts · no shared browser</text>
+    <text x="520" y="126" font-size="9.5" fill="#4C525C">profile · outbound traffic optional</text>
+
+    <line x1="796" y1="82" x2="838" y2="82" stroke="#1D6A58" stroke-width="1.4" marker-end="url(#p-ar)"/>
+
+    <g transform="rotate(-8 940 82)">
+      <circle cx="940" cy="82" r="46" fill="none" stroke="#1D6A58" stroke-width="2.6"/>
+      <circle cx="940" cy="82" r="39" fill="none" stroke="#1D6A58" stroke-width="0.9"/>
+      <text x="940" y="78" text-anchor="middle" font-size="15" font-weight="700" fill="#1D6A58">破棄</text>
+      <text x="940" y="94" text-anchor="middle" font-size="7" letter-spacing="1.4" fill="#1D6A58">DESTROYED</text>
+    </g>
+    <text x="880" y="150" font-size="9.5" fill="#4C525C">sandbox.delete()</text>
+
+    <!-- what stays -->
+    <line x1="0" y1="186" x2="1136" y2="186" stroke="#D5CDBB"/>
+    <text x="0" y="212" font-size="9" letter-spacing="1.5" fill="#7A8089">WHAT SURVIVES THE RUN</text>
+    <g font-size="10.5" fill="#15171B">
+      <text x="0" y="238">• the receipt number</text>
+      <text x="304" y="238">• a one-line summary for the family</text>
+      <text x="652" y="238">• redacted event log (digit runs ≥ 4 → 12＊＊＊＊)</text>
+    </g>
+    <text x="0" y="264" font-size="10" fill="#7A8089">Nothing else: no photo, no session, no password, no cache.</text>
+  </svg>
+
+  <div style="display:flex; gap:26px; margin-top:26px">
+    <div style="flex:1; border-left:2px solid var(--red); padding-left:14px">
+      <div style="font-size:12.5px; font-weight:700">No credentials, ever</div>
+      <div style="font-size:11px; color:var(--ink-2); line-height:1.55; margin-top:4px">The family never holds the parent’s ID or password. The agent does not log in; it uses the “apply without registering” path.</div>
+    </div>
+    <div style="flex:1; border-left:2px solid var(--red); padding-left:14px">
+      <div style="font-size:12.5px; font-weight:700">One errand, one machine</div>
+      <div style="font-size:11px; color:var(--ink-2); line-height:1.55; margin-top:4px">No shared browser profile, no reused session. A breach of one run cannot read another person’s paper.</div>
+    </div>
+    <div style="flex:1; border-left:2px solid var(--red); padding-left:14px">
+      <div style="font-size:12.5px; font-weight:700">Secrets never touch the repo</div>
+      <div style="font-size:11px; color:var(--ink-2); line-height:1.55; margin-top:4px">Keys arrive at runtime via <span class="mono">secret run</span>; <span class="mono">.env</span> is git-ignored. The public repo contains no keys, no logs, no fixtures with real people.</div>
+    </div>
+  </div>
+
+  <div class="foot"><span>Local-first inference · ephemeral execution · auditable output</span><span>11 / 15</span></div>
+</section>
