@@ -29,3 +29,5 @@ dist/
 demo/out/
 demo/video/out/
 submission/preview/
+submission/preview-ai/
+__pycache__/

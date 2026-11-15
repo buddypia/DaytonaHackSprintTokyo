@@ -1,0 +1,95 @@
+{
+  "schema": "hackathon-evidence/1",
+  "project": {
+    "name_ja": "おまかせ手続き",
+    "name_en": "Omakase Tetsuzuki",
+    "event": "Daytona HackSprint Tokyo",
+    "event_date": "2026-11-15",
+    "one_liner_ja": "届いた紙の通知を撮るだけで、AIが隔離マシン上のブラウザを操作し、行政の電子申請を完了・検証する。",
+    "one_liner_en": "Photograph a paper notice. An AI agent completes the actual e-government filing on an isolated Daytona desktop and proves every value it typed."
+  },
+  "criteria": {
+    "completeness": {
+      "claim": "撮影→読取→隔離マシン起動→ブラウザ操作→不足項目の質問→本人承認→送信→独立検証→家族通知→破棄までが1本の状態機械として実装され、E2Eで動作する。",
+      "evidence": ["E1", "E2", "E3", "E4", "E13", "E14", "E15"],
+      "verified": "Docker デスクトップと GCP 上で E2E を実機確認（README）。単体テストは 21 件中 19 件 pass、2 件は E2E ゲートで skip。",
+      "gaps": ["Daytona 実機と Nosana 実機はキー未取得のため未実行（実装は完了、失敗時は停止する設計）。"]
+    },
+    "innovation": {
+      "claim": "LLM の提案をコードの4つのゲート（出どころ・入れ忘れ・本人承認・独立検証）が拘束し、モデル自身に合否を判定させない。単なるチャットボットでも手順を固定した RPA でもない。",
+      "evidence": ["E2", "E3", "E4", "E8", "E11"],
+      "differentiators": [
+        "画面を [eN] 付きのテキストに落とし、初見のフォームでも1手ずつ判断する（手順スクリプト不要）",
+        "入力値の出どころを Source として保持し、出どころの無い入力をコードで拒否する",
+        "送信直前の確認画面と、申請サイトが実際に受け取ったデータを、モデル非依存の verify.mjs が照合する",
+        "検証用申請サイトをサンドボックス内に同居させ、実在サイトへの副作用ゼロで全工程を再現する"
+      ]
+    },
+    "real_life_problem_solving": {
+      "claim": "高齢者の『通知は届くが、意味が分からず、画面操作もできず、期限を過ぎる』問題と、家族が ID・パスワードを預かって代行する負担を、本人の3種類の操作（撮影・回答・承認）に圧縮する。",
+      "evidence": ["E1", "E8", "E9", "E10", "E20"],
+      "evidence_of_need": "PRD のペルソナ・ユーザーストーリー US-1〜US-10、README の課題記述。数値目標 90 秒は設計目標であり実測ではない。",
+      "privacy": "個人情報は商用 API に送らず、Nosana 上の OSS モデルまたはセルフホスト推論で処理。ログは数字列を伏せ、処理後にサンドボックスを破棄する。"
+    },
+    "sponsored_product_usage": {
+      "claim": "Daytona は実行基盤の中核（ライフサイクル8種の API を使用）。Nosana は視覚読取と操作判断の2役を担い、差し替え可能なプロバイダーとして実装。",
+      "daytona_api_calls": [
+        "new Daytona()",
+        "daytona.create({ snapshot | language, envVars })",
+        "sandbox.fs.uploadFile()",
+        "sandbox.computerUse.start()",
+        "sandbox.getSignedPreviewUrl(6080, 3600)",
+        "sandbox.process.executeCommand()",
+        "sandbox.process.createSession() / executeSessionCommand()",
+        "sandbox.delete()"
+      ],
+      "nosana_roles": [
+        "reader.ts: 通知画像 → NoticeExtraction JSON（vision）",
+        "operator.ts: 画面 + 目的 + 出どころ → 次の1手 JSON（action decision）",
+        "OPERATOR_AI_PROVIDER によるハイブリッド構成（読取 Nosana / 操作 Vertex など）"
+      ],
+      "evidence": ["E5", "E6", "E7", "E8", "E2", "E18"]
+    }
+  },
+  "verification": {
+    "unit_tests": { "command": "npm test", "total": 21, "pass": 19, "fail": 0, "skipped": 2, "skipped_reason": "E2E=1 のときだけ走る通し確認" },
+    "e2e": [
+      { "provider": "docker", "command": "E2E=1 SANDBOX_PROVIDER=docker npm test", "status": "verified_on_real_machine" },
+      { "provider": "gcp", "command": "E2E=1 SANDBOX_PROVIDER=gcp npm test", "status": "verified_on_real_machine" },
+      { "provider": "daytona", "command": "secret run DAYTONA_API_KEY -- npm start", "status": "implemented_not_live_verified" }
+    ],
+    "verifier": {
+      "file": "sandbox/verify/verify.mjs",
+      "contract": "exit 0 = 合格 / exit 1 = 不合格",
+      "checks": 7,
+      "model_in_loop": false
+    },
+    "demo_assets": {
+      "video": "demo/out/omakase-demo.mp4",
+      "deck_pdf": "submission/omakase-tetsuzuki-deck.pdf",
+      "deck_pptx": "submission/omakase-tetsuzuki-3min.pptx",
+      "architecture_pdf": "submission/ai-review.pdf"
+    }
+  },
+  "run": {
+    "commands": ["npm install", "npm run desktop:build", "npm start"],
+    "url": "http://localhost:8787",
+    "expected": "見本の請求書で試す → 3行説明 → 隔離デスクトップで操作 → 承認 → 受付番号 → 検証 exit 0 → 破棄"
+  },
+  "files": {
+    "src/flow.ts": "状態機械とオーケストレーション",
+    "src/operator.ts": "Computer Use エージェントと4ゲート",
+    "src/sandbox.ts": "Daytona / Docker / GCP / local の Runner",
+    "src/reader.ts": "書類の視覚読取と正規化",
+    "src/ai.ts": "Nosana / Vertex の推論プロバイダー",
+    "sandbox/agent/act.mjs": "1手の操作と [eN] スナップショット",
+    "sandbox/verify/verify.mjs": "モデル非依存の検証器",
+    "sandbox/site/server.mjs": "サンドボックス内の検証用申請サイト"
+  },
+  "limitations": [
+    "本番の行政手続きへの送信は対象外。既定はサンドボックス内の検証用サイト。",
+    "署名・マイナンバーカード等の本人確認が必要な手続きは対象外。",
+    "Daytona と Nosana は実機キー未取得のため、ライブ実行の証跡はまだ無い。",
+    "90 秒・操作回数などの数値は設計目標で、実測値ではない。"
+  ]
+}

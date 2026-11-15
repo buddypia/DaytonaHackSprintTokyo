@@ -8,7 +8,7 @@ import { randomUUID } from "node:crypto";
 import { mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { createServer } from "node:net";
 import { homedir, tmpdir, userInfo } from "node:os";
-import { join, relative } from "node:path";
+import { basename, join, relative } from "node:path";
 
 const SANDBOX_SRC = join(import.meta.dirname, "..", "sandbox");
 
@@ -116,7 +116,7 @@ class DaytonaRunner implements Runner {
   private sandbox?: Sandbox;
   private appDir = APP;
   private workDir = WORK;
-  private env: Record<string, string> = { WORK_DIR: WORK, CDP_PORT: "9222" };
+  private env: Record<string, string> = { WORK_DIR: WORK, CDP_PORT: "9222", FC_LANG: "ja" };
   private sessions = 0;
 
   async setup(startUrl: string) {
@@ -176,9 +176,10 @@ class DaytonaRunner implements Runner {
         );
         if (install.exitCode !== 0) throw new Error(`ブラウザの導入に失敗しました: ${install.result.slice(-500)}`);
       }
-      // 申請サイトの日本語を画面に出すためのフォント（入らなくても処理は続ける）
-      await this.sandbox.process.executeCommand("sh -c 'sudo apt-get install -y -qq fonts-noto-cjk >/dev/null 2>&1 || true'", this.appDir, undefined, 120);
     }
+
+    // 申請サイト・デスクトップの日本語を表示するため、仮想デスクトップやブラウザ起動前にフォントを確実に入れる
+    await this.ensureJapaneseFont(home);
 
     // Computer Use: Xvfb + xfce4 + x11vnc + noVNC（6080）を起動し、Bot のブラウザをこの画面に出す
     await this.sandbox.computerUse.start();
@@ -197,6 +198,43 @@ class DaytonaRunner implements Runner {
 
     await checkReach(this, startUrl);
     await startBrowser(this, startUrl, this.env.CDP_PORT);
+  }
+
+  private async ensureJapaneseFont(home: string) {
+    const installCmd = [
+      'run_root() { if [ "$(id -u)" = 0 ]; then sh -c "$1"; else sudo -n sh -c "$1"; fi; }',
+      "if ! fc-list :lang=ja 2>/dev/null | grep -q .; then",
+      "  run_root 'apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends fonts-ipaexfont-gothic || DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends fonts-ipafont-gothic || DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends fonts-noto-cjk' >/dev/null 2>&1 || true",
+      "  fc-cache -f >/dev/null 2>&1 || true",
+      "fi",
+      "fc-list :lang=ja 2>/dev/null | grep -q .",
+    ].join("\n");
+    const installed = await this.sandbox!.process.executeCommand(
+      `sh -c ${shQuote(installCmd)}`,
+      this.appDir,
+      undefined,
+      180,
+    );
+    if (installed.exitCode === 0) return;
+
+    // apt-get が通信制限等で失敗した場合のフォールバックとして、ホストの日本語フォントを転送する
+    const candidates = [
+      process.env.OMAKASE_JP_FONT,
+      join(homedir(), "Library/Fonts/SourceHanCodeJP-Regular.otf"),
+      join(homedir(), "Library/Fonts/NotoSansCJKjp-Regular.otf"),
+      "/usr/share/fonts/opentype/ipafont-gothic/ipagp.ttf",
+      "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+    ].filter((p): p is string => Boolean(p));
+
+    const fontDir = `${home}/.local/share/fonts`;
+    for (const fontPath of candidates) {
+      const data = await readFile(fontPath).catch(() => null);
+      if (!data) continue;
+      await this.sandbox!.process.executeCommand(`mkdir -p ${shQuote(fontDir)}`, undefined, undefined, 15);
+      await this.sandbox!.fs.uploadFile(data, `${fontDir}/${basename(fontPath)}`);
+      await this.sandbox!.process.executeCommand(`fc-cache -f ${shQuote(fontDir)} >/dev/null 2>&1 || true`, undefined, undefined, 30);
+      return;
+    }
   }
 
   async exec(cmd: string, timeoutSec = 120) {

@@ -3,8 +3,8 @@ import { AbsoluteFill, Sequence, interpolate, spring, staticFile, useCurrentFram
 import { C, FONT, MONO } from "./theme";
 import { Caption, Chip, Fade, Headline, Paper, Screen, Shot } from "./ui";
 
-const APP = "app1.mp4"; // 実際に動かした画面（1600x900）
-const DESK = "desk.mp4"; // 隔離マシンのデスクトップ（1440x900 / noVNC）
+const APP = "app3.mp4"; // 実際に動かした画面（1600x900）
+const DESK = "desk3.mp4"; // 隔離マシンのデスクトップ（1440x900 / noVNC）
 
 // 16:9 の画面枠（右）と、説明（左）
 const SCR = { x: 668, y: 198, w: 1140, h: 641 };
@@ -140,7 +140,7 @@ const Step1: React.FC = () => (
     <Sequence from={80} durationInFrames={130} layout="none">
       <Shot
         src={APP}
-        from={8.8}
+        from={56.2}
         sourceW={1600}
         sourceH={900}
         crop={{ x: 108, y: 146, w: 694, h: 390 }}
@@ -174,10 +174,10 @@ const Step2: React.FC = () => {
   return (
     <Stage>
       <Sequence durationInFrames={200} layout="none">
-        <Shot src={DESK} from={12.2} rate={1.25} sourceW={1440} sourceH={900} width={SCR.w} height={FRAME_H} label="Daytona sandbox — 隔離マシンのデスクトップ" live style={{ position: "absolute", left: SCR.x, top: SCR.y }} />
+        <Shot src={DESK} from={80.5} rate={1.0} sourceW={1440} sourceH={900} width={SCR.w} height={FRAME_H} label="Daytona sandbox — 隔離マシンのデスクトップ" live style={{ position: "absolute", left: SCR.x, top: SCR.y }} />
       </Sequence>
       <Sequence from={200} durationInFrames={175} layout="none">
-        <Shot src={DESK} from={23.5} rate={1.35} sourceW={1440} sourceH={900} width={SCR.w} height={FRAME_H} label="Daytona sandbox — 隔離マシンのデスクトップ" live style={{ position: "absolute", left: SCR.x, top: SCR.y }} />
+        <Shot src={DESK} from={88.0} rate={1.3} sourceW={1440} sourceH={900} width={SCR.w} height={FRAME_H} label="Daytona sandbox — 隔離マシンのデスクトップ" live style={{ position: "absolute", left: SCR.x, top: SCR.y }} />
       </Sequence>
       <Side
         n="2"
@@ -200,7 +200,7 @@ const Step3: React.FC = () => (
   <Stage>
     <Shot
       src={APP}
-      from={49.9}
+      from={95.2}
       rate={0.55}
       sourceW={1600}
       sourceH={900}
@@ -227,7 +227,7 @@ const Step3: React.FC = () => (
 // 6. ④ 承認して送信
 const Step4: React.FC = () => (
   <Stage>
-    <Shot src={DESK} from={50.0} rate={1.0} sourceW={1440} sourceH={900} width={SCR.w} height={FRAME_H} label="Daytona sandbox — 申請サイトの確認画面" live style={{ position: "absolute", left: SCR.x, top: SCR.y }} />
+    <Shot src={DESK} from={100.0} rate={1.0} sourceW={1440} sourceH={900} width={SCR.w} height={FRAME_H} label="Daytona sandbox — 申請サイトの確認画面" live style={{ position: "absolute", left: SCR.x, top: SCR.y }} />
     <Side
       n="4"
       title="読み上げて、「はい」で送信"
@@ -252,7 +252,7 @@ const Proof: React.FC = () => {
   const ok = spring({ frame: frame - 24, fps, config: { damping: 16 } });
   return (
     <Stage>
-      <Shot src={DESK} from={61.0} rate={1} sourceW={1440} sourceH={900} width={SCR.w} height={FRAME_H} label="Daytona sandbox — 申請サイトの完了画面" live style={{ position: "absolute", left: SCR.x, top: SCR.y }} />
+      <Shot src={DESK} from={112.0} rate={1} sourceW={1440} sourceH={900} width={SCR.w} height={FRAME_H} label="Daytona sandbox — 申請サイトの完了画面" live style={{ position: "absolute", left: SCR.x, top: SCR.y }} />
       <Side
         n="5"
         title={"送信した内容を、\n機械で照合する"}

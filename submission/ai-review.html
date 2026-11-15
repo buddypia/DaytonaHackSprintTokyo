@@ -1,0 +1,913 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>AI Review Pack — おまかせ手続き / Architecture & Evidence</title>
+<style>
+  @page { size: A4; margin: 0; }
+  :root{
+    --paper:#F7F3E8; --paper-2:#FBF8F0; --ink:#15171B; --ink-2:#4C525C; --ink-3:#7C828C;
+    --line:#D8D0BE; --line-2:#E7E0D0; --red:#BF3A2B; --red-soft:#F3E0DB;
+    --green:#1D6A58; --green-soft:#DDEBE5; --blue:#2C4A73; --blue-soft:#DEE6F0;
+    --gold:#A97E24; --gold-soft:#F1E6CC;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:#0B0D11; }
+  body{
+    font-family:"Helvetica Neue","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;
+    -webkit-font-smoothing:antialiased; font-feature-settings:"palt" 1; color:var(--ink);
+  }
+  .page{
+    position:relative; width:210mm; height:297mm; padding:12mm 12mm 14mm;
+    background:var(--paper); overflow:hidden; break-after:page; page-break-after:always;
+  }
+  .page:last-child{ break-after:auto; page-break-after:auto; }
+  @media screen{ body{ padding:26px 0; } .page{ margin:0 auto 26px; box-shadow:0 24px 70px rgba(0,0,0,.55); } }
+  @media print{ body{ background:#fff; } .page{ box-shadow:none; } }
+
+  .phead{ display:flex; justify-content:space-between; align-items:baseline; border-bottom:1px solid var(--ink); padding-bottom:2.2mm; margin-bottom:5mm; }
+  .phead .l{ font-family:"SF Mono",Menlo,monospace; font-size:6.4pt; letter-spacing:.16em; text-transform:uppercase; }
+  .phead .r{ font-family:"SF Mono",Menlo,monospace; font-size:6.4pt; letter-spacing:.12em; color:var(--ink-3); }
+  .pfoot{ position:absolute; left:12mm; right:12mm; bottom:7mm; display:flex; justify-content:space-between; align-items:baseline; border-top:1px solid var(--line); padding-top:1.8mm; font-family:"SF Mono",Menlo,monospace; font-size:6pt; letter-spacing:.1em; color:var(--ink-3); }
+  .kicker{ font-family:"SF Mono",Menlo,monospace; font-size:7pt; letter-spacing:.16em; text-transform:uppercase; color:var(--red); }
+  h1{ font-size:31pt; line-height:1.02; letter-spacing:-.045em; margin:3mm 0 0; font-weight:700; }
+  h2{ font-size:17pt; line-height:1.16; letter-spacing:-.025em; margin:0 0 1.2mm; font-weight:700; }
+  h3{ font-size:10pt; line-height:1.3; margin:0 0 1mm; font-weight:700; }
+  p{ margin:0; }
+  .sub{ font-family:"SF Mono",Menlo,monospace; font-size:7.4pt; letter-spacing:.05em; color:var(--ink-2); margin-top:2mm; }
+  .lede{ font-size:10pt; line-height:1.62; max-width:150mm; margin-top:5mm; color:var(--ink-2); }
+  .lede b{ color:var(--ink); }
+  .small{ font-size:8.2pt; line-height:1.52; color:var(--ink-2); }
+  .tiny{ font-size:7pt; line-height:1.45; color:var(--ink-2); }
+  .mono{ font-family:"SF Mono",Menlo,monospace; }
+  .red{ color:var(--red); } .green{ color:var(--green); } .blue{ color:var(--blue); } .gold{ color:var(--gold); }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:4mm; }
+  .grid3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:3mm; }
+  .grid4{ display:grid; grid-template-columns:repeat(4,1fr); gap:2.6mm; }
+  .card{ background:var(--paper-2); border:1px solid var(--line); padding:3mm 3.2mm; }
+  .card.ink{ border-color:var(--ink); }
+  .tag{ display:inline-block; font-family:"SF Mono",Menlo,monospace; font-size:6.2pt; letter-spacing:.07em; text-transform:uppercase; border:1px solid var(--line); padding:.7mm 1.6mm; color:var(--ink-2); background:#fff; }
+  .tag.red{ border-color:var(--red); color:var(--red); background:var(--red-soft); }
+  .tag.green{ border-color:var(--green); color:var(--green); background:var(--green-soft); }
+  .tag.blue{ border-color:var(--blue); color:var(--blue); background:var(--blue-soft); }
+  .tag.gold{ border-color:var(--gold); color:var(--gold); background:var(--gold-soft); }
+  table.t{ width:100%; border-collapse:collapse; font-size:8.2pt; line-height:1.42; }
+  table.t th{ text-align:left; font-family:"SF Mono",Menlo,monospace; font-size:6.4pt; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-3); font-weight:500; border-bottom:1px solid var(--ink); padding:1.6mm 1.4mm; vertical-align:bottom; }
+  table.t td{ border-bottom:1px solid var(--line-2); padding:1.6mm 1.4mm; vertical-align:top; }
+  table.t tr:last-child td{ border-bottom:0; }
+  .code{ font-family:"SF Mono",Menlo,monospace; font-size:7pt; line-height:1.55; background:#12161D; color:#EDE8DC; padding:2.6mm 3mm; overflow:hidden; white-space:pre; }
+  .code .c{ color:#8FA0B5; } .code .g{ color:#8CD3B8; } .code .r{ color:#F09383; } .code .y{ color:#E8C97B; }
+  .kv{ display:flex; gap:2mm; align-items:baseline; }
+  .bar{ height:2.2mm; background:var(--line-2); position:relative; overflow:hidden; }
+  .bar > i{ position:absolute; inset:0 auto 0 0; background:var(--ink); }
+  .metric{ font-size:24pt; line-height:1; font-weight:700; letter-spacing:-.04em; }
+  .metric small{ font-size:7pt; font-family:"SF Mono",Menlo,monospace; letter-spacing:.08em; font-weight:400; color:var(--ink-3); margin-left:1.5mm; }
+  .rule{ border-top:1px solid var(--line); margin:3mm 0; }
+  .secnum{ font-family:"SF Mono",Menlo,monospace; font-size:6.8pt; letter-spacing:.14em; color:var(--red); text-transform:uppercase; margin-bottom:1mm; }
+  svg{ display:block; width:100%; height:auto; overflow:visible; }
+  svg text{ font-family:"Helvetica Neue","Hiragino Sans","Yu Gothic",sans-serif; }
+  .legend{ display:grid; grid-template-columns:1fr 1fr; gap:1mm 5mm; font-size:7pt; line-height:1.38; color:var(--ink-2); }
+  .legend b{ font-family:"SF Mono",Menlo,monospace; color:var(--ink); font-weight:600; }
+  .pagettl{ display:flex; justify-content:space-between; align-items:flex-end; gap:8mm; margin-bottom:3mm; }
+  .pagettl .no{ font-family:"SF Mono",Menlo,monospace; font-size:6.4pt; letter-spacing:.14em; color:var(--red); }
+  .callout{ border-left:2.5pt solid var(--red); padding:2.2mm 0 2.2mm 3mm; font-size:8.6pt; line-height:1.55; }
+  .callout b{ color:var(--red); }
+  ul{ margin:0; padding-left:4mm; } li{ margin:0 0 1mm; }
+  .nowrap{ white-space:nowrap; }
+</style>
+</head>
+<body>
+
+<!-- ============================== 01 COVER ============================== -->
+<section class="page">
+  <div class="phead"><div class="l">AI Review Pack — Architecture &amp; Evidence</div><div class="r">01 / 07</div></div>
+
+  <div class="kicker">Daytona HackSprint Tokyo · 2026.11.15 · 75-min build · 2-min demo</div>
+  <h1>おまかせ手続き</h1>
+  <div class="sub">OMAKASE TETSUZUKI — paper notice → isolated computer use → verified e-government filing</div>
+
+  <p class="lede">
+    届いた紙の通知を、本人が<b>撮影して送るだけ</b>。AI エージェントが
+    <b>Daytona の隔離デスクトップ</b>で申請サイトを 1 手ずつ操作し、不足項目だけを本人に聞き、
+    「はい」の後に送信する。送信後は<b>モデルを使わない検証器</b>が申請サイト自身の画面と受領データを照合し、
+    <span class="mono green">exit 0</span> を返すまでを 1 実行で閉じる。
+  </p>
+
+  <div class="grid4" style="margin-top:7mm">
+    <div class="card ink">
+      <div class="tag green">Completeness</div>
+      <div style="font-size:12pt;font-weight:700;line-height:1.2;margin:1.6mm 0 1mm">End-to-end<br>MVP</div>
+      <div class="tiny">撮影→読取→起動→操作→質問→承認→送信→検証→通知→破棄。E2E は Docker / GCP で実機確認。</div>
+    </div>
+    <div class="card ink">
+      <div class="tag red">Innovation</div>
+      <div style="font-size:12pt;font-weight:700;line-height:1.2;margin:1.6mm 0 1mm">Code-bound<br>Computer Use</div>
+      <div class="tiny">LLM の提案を 4 ゲートが拘束。合否はモデルではなく検証器が決める。</div>
+    </div>
+    <div class="card ink">
+      <div class="tag blue">Real-Life</div>
+      <div style="font-size:12pt;font-weight:700;line-height:1.2;margin:1.6mm 0 1mm">3 operations<br>for a filing</div>
+      <div class="tiny">撮影・回答・承認だけ。家族の ID/パスワード代行と期限切れを減らす。</div>
+    </div>
+    <div class="card ink">
+      <div class="tag gold">Sponsors</div>
+      <div style="font-size:12pt;font-weight:700;line-height:1.2;margin:1.6mm 0 1mm">Daytona core<br>+ Nosana</div>
+      <div class="tiny">Daytona はライフサイクル 8 API を中核使用。Nosana は読取と操作判断の 2 役。</div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:6mm">
+    <div>
+      <div class="secnum">What the user does</div>
+      <table class="t">
+        <tr><td style="width:8mm" class="mono red">01</td><td>通知を撮影して送る</td></tr>
+        <tr><td class="mono red">02</td><td>分からない項目だけに答える（ボタン / 音声 / 文字）</td></tr>
+        <tr><td class="mono red">03</td><td>読み上げを聞いて「はい」と言う</td></tr>
+        <tr><td class="mono red">—</td><td class="small">受付番号を受け取り、家族に完了が届く</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="secnum">What is verified (not claimed)</div>
+      <table class="t">
+        <tr><td style="width:22mm"><span class="tag green">Live</span></td><td>Vertex AI の読取・操作 / Docker・GCP の E2E / 佐倉市の体験手続き</td></tr>
+        <tr><td><span class="tag red">Code only</span></td><td>Daytona 実機 / Nosana 実機（キー未取得のため未実行、実装は完了）</td></tr>
+        <tr><td><span class="tag gold">Design target</span></td><td>90 秒・操作回数（実測ではなく設計目標）</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="secnum" style="margin-top:6mm">One run, six steps — no manual scripting</div>
+  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:1.6mm;margin-top:1.5mm">
+    <div class="card" style="padding:2mm"><div class="mono red" style="font-size:6.6pt">01</div><div style="font-size:8pt;font-weight:700;margin-top:.6mm">撮影</div><div class="tiny">通知を 1 枚送る</div></div>
+    <div class="card" style="padding:2mm"><div class="mono red" style="font-size:6.6pt">02</div><div style="font-size:8pt;font-weight:700;margin-top:.6mm">読取</div><div class="tiny">3 行 + 本人情報</div></div>
+    <div class="card" style="padding:2mm"><div class="mono red" style="font-size:6.6pt">03</div><div style="font-size:8pt;font-weight:700;margin-top:.6mm">隔離起動</div><div class="tiny">Daytona + 画面</div></div>
+    <div class="card" style="padding:2mm"><div class="mono red" style="font-size:6.6pt">04</div><div style="font-size:8pt;font-weight:700;margin-top:.6mm">操作 / 質問</div><div class="tiny">初見フォームへ追従</div></div>
+    <div class="card" style="padding:2mm"><div class="mono red" style="font-size:6.6pt">05</div><div style="font-size:8pt;font-weight:700;margin-top:.6mm">承認 / 送信</div><div class="tiny">「はい」の後だけ</div></div>
+    <div class="card" style="padding:2mm"><div class="mono red" style="font-size:6.6pt">06</div><div style="font-size:8pt;font-weight:700;margin-top:.6mm">検証 / 破棄</div><div class="tiny">exit 0 → delete</div></div>
+  </div>
+
+  <div class="code" style="margin-top:4mm">{
+  "core_claim": "LLM proposes. Code enforces. An independent verifier decides pass/fail.",
+  "gates": ["provenance", "completeness", "human approval", "independent verification"],
+  "daytona": { "role": "core isolated runtime", "api_surface": 8, "desktop": "computerUse + noVNC" },
+  "nosana":  { "role": "vision + action inference", "modes": ["reader", "operator", "hybrid"] },
+  "tests":   { "total": 21, "pass": 19, "fail": 0, "skipped": 2 },
+  "default_target": "in-sandbox verification site — no real-world submission"
+}</div>
+
+  <div class="pfoot"><span>OMAKASE TETSUZUKI / AI REVIEW PACK</span><span>Full evidence: submission/AI_REVIEW.md · evidence.json</span></div>
+</section>
+
+<!-- ============================== 02 ARCHITECTURE ============================== -->
+<section class="page">
+  <div class="phead"><div class="l">02 · Architecture</div><div class="r">02 / 07</div></div>
+  <div class="pagettl">
+    <div>
+      <div class="secnum">System architecture</div>
+      <h2>信頼できない入力は左から入り、<br>決定論的なゲートを通って右で実行される。</h2>
+    </div>
+    <div class="small" style="width:64mm;text-align:right">
+      LLM は「提案」だけを行う。入力の採用・送信・合否はコードが決める。
+      点線はストリーム、赤は信頼境界。
+    </div>
+  </div>
+
+  <svg viewBox="0 0 720 500" role="img" aria-label="Omakase Tetsuzuki system architecture">
+    <defs>
+      <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#15171B"/></marker>
+      <marker id="arG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1D6A58"/></marker>
+      <marker id="arR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#BF3A2B"/></marker>
+      <marker id="arB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2C4A73"/></marker>
+    </defs>
+
+    <!-- inference band -->
+    <rect x="132" y="2" width="584" height="62" fill="#DEE6F0" stroke="#2C4A73" stroke-width="1"/>
+    <text x="140" y="14" font-size="6.2" letter-spacing="1.2" fill="#2C4A73" font-family="SF Mono, Menlo, monospace">INFERENCE LAYER — OpenAI-compatible / chat/completions</text>
+    <rect x="140" y="20" width="300" height="38" fill="#FBF8F0" stroke="#2C4A73"/>
+    <text x="150" y="33" font-size="9" font-weight="700" fill="#15171B">Nosana GPU</text>
+    <text x="150" y="45" font-size="7.2" fill="#4C525C">OSS VLM + LLM · reader（視覚） / operator（操作判断）</text>
+    <text x="150" y="54" font-size="6.2" fill="#7C828C" font-family="SF Mono, Menlo, monospace">temperature 0 · JSON mode · privacy-first</text>
+    <rect x="452" y="20" width="256" height="38" fill="#FBF8F0" stroke="#2C4A73"/>
+    <text x="462" y="33" font-size="9" font-weight="700" fill="#15171B">Vertex AI Gemini</text>
+    <text x="462" y="45" font-size="7.2" fill="#4C525C">fallback provider · 実機で読取・操作を確認済み</text>
+    <text x="462" y="54" font-size="6.2" fill="#7C828C" font-family="SF Mono, Menlo, monospace">AI_PROVIDER=vertex · hedge 6s</text>
+
+    <!-- lanes -->
+    <rect x="4" y="72" width="120" height="400" fill="#FBF8F0" stroke="#D8D0BE"/>
+    <rect x="132" y="72" width="202" height="400" fill="#FBF8F0" stroke="#D8D0BE"/>
+    <rect x="342" y="72" width="374" height="400" fill="#FDF9F1" stroke="#BF3A2B" stroke-dasharray="5 3"/>
+    <text x="10" y="84" font-size="6.2" letter-spacing="1.2" fill="#7C828C" font-family="SF Mono, Menlo, monospace">PEOPLE</text>
+    <text x="138" y="84" font-size="6.2" letter-spacing="1.2" fill="#7C828C" font-family="SF Mono, Menlo, monospace">ORCHESTRATOR</text>
+    <text x="348" y="84" font-size="6.2" letter-spacing="1.2" fill="#BF3A2B" font-family="SF Mono, Menlo, monospace">DAYTONA SANDBOX — per run · deleted on exit</text>
+
+    <!-- people -->
+    <rect x="12" y="94" width="104" height="104" fill="#FFFFFF" stroke="#15171B"/>
+    <text x="22" y="110" font-size="9" font-weight="700">本人（78 歳）</text>
+    <text x="22" y="124" font-size="7.2" fill="#4C525C">撮影する</text>
+    <text x="22" y="137" font-size="7.2" fill="#4C525C">質問に答える</text>
+    <text x="22" y="150" font-size="7.2" fill="#4C525C">「はい」と言う</text>
+    <text x="22" y="176" font-size="6.2" fill="#1D6A58" font-family="SF Mono, Menlo, monospace">3 OPERATIONS</text>
+    <text x="22" y="188" font-size="6.2" fill="#7C828C">スマートフォン</text>
+
+    <rect x="12" y="236" width="104" height="104" fill="#FFFFFF" stroke="#15171B"/>
+    <text x="22" y="252" font-size="9" font-weight="700">家族（別居）</text>
+    <text x="22" y="266" font-size="7.2" fill="#4C525C">noVNC で見守る</text>
+    <text x="22" y="279" font-size="7.2" fill="#4C525C">完了通知を受け取る</text>
+    <text x="22" y="292" font-size="7.2" fill="#4C525C">ID/PW を預からない</text>
+    <text x="22" y="318" font-size="6.2" fill="#2C4A73" font-family="SF Mono, Menlo, monospace">VIEW ONLY</text>
+
+    <rect x="12" y="364" width="104" height="96" fill="#F1E6CC" stroke="#A97E24"/>
+    <text x="22" y="380" font-size="6.2" letter-spacing="1" fill="#A97E24" font-family="SF Mono, Menlo, monospace">DESIGN TARGET</text>
+    <text x="22" y="396" font-size="14" font-weight="700">90 秒</text>
+    <text x="22" y="410" font-size="6.6" fill="#4C525C">撮影から受付番号まで</text>
+    <text x="22" y="422" font-size="6.6" fill="#4C525C">（実測ではなく目標）</text>
+    <text x="22" y="438" font-size="6.2" fill="#7C828C">質問は最大 3 問</text>
+    <text x="22" y="448" font-size="6.2" fill="#7C828C">操作は最大 30 手</text>
+
+    <!-- orchestrator -->
+    <rect x="140" y="94" width="90" height="48" fill="#FFFFFF" stroke="#15171B"/>
+    <text x="148" y="108" font-size="8" font-weight="700">reader.ts</text>
+    <text x="148" y="120" font-size="6.4" fill="#4C525C">vision → JSON</text>
+    <text x="148" y="131" font-size="6.2" fill="#7C828C">confidence ≥ 0.8</text>
+
+    <rect x="236" y="94" width="90" height="48" fill="#FFFFFF" stroke="#15171B"/>
+    <text x="244" y="108" font-size="8" font-weight="700">operator.ts</text>
+    <text x="244" y="120" font-size="6.4" fill="#4C525C">1 action / turn</text>
+    <text x="244" y="131" font-size="6.2" fill="#7C828C">observe → decide</text>
+
+    <rect x="140" y="158" width="186" height="32" fill="#FFFFFF" stroke="#15171B"/>
+    <text x="148" y="178" font-size="8" font-weight="700">flow.ts</text>
+    <text x="190" y="178" font-size="6.8" fill="#4C525C">— state machine</text>
+
+    <rect x="140" y="200" width="186" height="32" fill="#FFFFFF" stroke="#15171B"/>
+    <text x="148" y="220" font-size="8" font-weight="700">server.ts</text>
+    <text x="198" y="220" font-size="6.8" fill="#4C525C">— HTTP + SSE + approval API</text>
+
+    <rect x="140" y="242" width="186" height="32" fill="#FFFFFF" stroke="#15171B"/>
+    <text x="148" y="262" font-size="8" font-weight="700">sandbox.ts</text>
+    <text x="206" y="262" font-size="6.8" fill="#4C525C">— Runner abstraction</text>
+
+    <rect x="140" y="284" width="186" height="56" fill="#F3E0DB" stroke="#BF3A2B"/>
+    <text x="148" y="298" font-size="7.4" font-weight="700" fill="#BF3A2B" letter-spacing=".6">4 GATES (code-enforced)</text>
+    <text x="148" y="311" font-size="6.4" fill="#15171B">① provenance　② completeness</text>
+    <text x="148" y="322" font-size="6.4" fill="#15171B">③ human approval　④ verification</text>
+    <text x="148" y="333" font-size="6" fill="#7C828C" font-family="SF Mono, Menlo, monospace">the model cannot bypass these</text>
+
+    <rect x="140" y="350" width="186" height="28" fill="#FFFFFF" stroke="#15171B"/>
+    <text x="148" y="368" font-size="7.4" font-weight="700">dispose()</text>
+    <text x="186" y="368" font-size="6.4" fill="#4C525C">— success / fail / cancel</text>
+
+    <rect x="140" y="392" width="186" height="66" fill="#FFFFFF" stroke="#D8D0BE" stroke-dasharray="3 2"/>
+    <text x="148" y="406" font-size="6.2" letter-spacing="1" fill="#BF3A2B" font-family="SF Mono, Menlo, monospace">FAIL-CLOSED</text>
+    <text x="148" y="419" font-size="6.2" fill="#4C525C">モデル無し / 読取不能 / 隔離マシン無し</text>
+    <text x="148" y="430" font-size="6.2" fill="#4C525C">→ 黙って local に落ちず、エラーで停止</text>
+    <text x="148" y="446" font-size="5.8" fill="#7C828C" font-family="SF Mono, Menlo, monospace">no silent fallback</text>
+    <text x="140" y="468" font-size="5.8" fill="#7C828C" font-family="SF Mono, Menlo, monospace">Node.js 23.6+ · deps 2 · no framework</text>
+
+    <!-- sandbox internals -->
+    <rect x="350" y="94" width="130" height="50" fill="#FFFFFF" stroke="#15171B"/>
+    <text x="358" y="108" font-size="8" font-weight="700">act.mjs</text>
+    <text x="358" y="120" font-size="6.4" fill="#4C525C">[eN] aria snapshot</text>
+    <text x="358" y="131" font-size="6.4" fill="#4C525C">+ screenshot (JPEG)</text>
+
+    <rect x="490" y="94" width="98" height="50" fill="#FFFFFF" stroke="#15171B"/>
+    <text x="498" y="108" font-size="8" font-weight="700">Desktop</text>
+    <text x="498" y="120" font-size="6.2" fill="#4C525C">Xvfb + xfce4</text>
+    <text x="498" y="131" font-size="6.2" fill="#4C525C">x11vnc</text>
+
+    <rect x="598" y="94" width="110" height="50" fill="#DEE6F0" stroke="#2C4A73"/>
+    <text x="606" y="108" font-size="8" font-weight="700">noVNC :6080</text>
+    <text x="606" y="120" font-size="6.2" fill="#4C525C">signed preview URL</text>
+    <text x="606" y="131" font-size="6.2" fill="#4C525C">view_only = true</text>
+
+    <rect x="350" y="166" width="130" height="58" fill="#FFFFFF" stroke="#15171B"/>
+    <text x="358" y="181" font-size="8" font-weight="700">Chromium</text>
+    <text x="358" y="193" font-size="6.4" fill="#4C525C">CDP 9222</text>
+    <text x="358" y="204" font-size="6.4" fill="#4C525C">Playwright</text>
+    <text x="358" y="215" font-size="6" fill="#7C828C">resident process</text>
+
+    <rect x="490" y="166" width="218" height="58" fill="#FFFFFF" stroke="#15171B"/>
+    <text x="498" y="181" font-size="8" font-weight="700">検証用 申請サイト（架空の「ひばり野市」）</text>
+    <text x="498" y="193" font-size="6.4" fill="#4C525C">127.0.0.1:8090 · 6 procedures + 照会</text>
+    <text x="498" y="204" font-size="6.4" fill="#4C525C">確認画面 / 完了画面 / 受付番号を生成</text>
+    <text x="498" y="215" font-size="6" fill="#1D6A58" font-family="SF Mono, Menlo, monospace">NO EXTERNAL SIDE EFFECT</text>
+
+    <rect x="350" y="246" width="246" height="56" fill="#FFFFFF" stroke="#15171B"/>
+    <text x="358" y="260" font-size="6.2" letter-spacing="1" fill="#7C828C" font-family="SF Mono, Menlo, monospace">EVIDENCE (in sandbox)</text>
+    <text x="358" y="273" font-size="6.4" fill="#15171B" font-family="SF Mono, Menlo, monospace">expected.json · confirm-page.txt</text>
+    <text x="358" y="284" font-size="6.4" fill="#15171B" font-family="SF Mono, Menlo, monospace">done-page.txt · site-received.json</text>
+    <text x="358" y="296" font-size="5.8" fill="#7C828C">入力記録・送信直前の画面・受領データ</text>
+
+    <rect x="606" y="246" width="102" height="56" fill="#F3E0DB" stroke="#BF3A2B"/>
+    <text x="614" y="260" font-size="8" font-weight="700" fill="#BF3A2B">verify.mjs</text>
+    <text x="614" y="273" font-size="6.2" fill="#4C525C">no LLM judgement</text>
+    <text x="614" y="284" font-size="6.2" fill="#4C525C">exit 0 / 1</text>
+    <text x="614" y="295" font-size="5.8" fill="#7C828C">8 checks</text>
+
+    <rect x="350" y="324" width="130" height="28" fill="#FFFFFF" stroke="#15171B"/>
+    <text x="358" y="342" font-size="7" font-family="SF Mono, Menlo, monospace">sandbox.delete()</text>
+
+    <rect x="490" y="324" width="218" height="28" fill="#DDEBE5" stroke="#1D6A58"/>
+    <text x="498" y="342" font-size="6.8" fill="#1D6A58" font-family="SF Mono, Menlo, monospace">NO EGRESS BY DEFAULT — site lives inside</text>
+
+    <!-- arrows -->
+    <path d="M116,146 L126,146 L126,216 L140,216" fill="none" stroke="#15171B" stroke-width="1" marker-end="url(#ar)"/>
+    <g><circle cx="126" cy="156" r="6.4" fill="#F7F3E8" stroke="#15171B"/><text x="126" y="158.6" font-size="6.6" text-anchor="middle">1</text></g>
+
+    <path d="M140,228 L122,228 L122,288 L116,288" fill="none" stroke="#2C4A73" stroke-width="1" stroke-dasharray="3 2.5" marker-end="url(#arB)"/>
+    <g><circle cx="121" cy="256" r="6.4" fill="#F7F3E8" stroke="#2C4A73"/><text x="121" y="258.6" font-size="6.6" text-anchor="middle" fill="#2C4A73">2</text></g>
+
+    <path d="M210,94 L210,64" fill="none" stroke="#2C4A73" stroke-width="1.2" marker-start="url(#arB)" marker-end="url(#arB)"/>
+    <g><circle cx="203" cy="78" r="6.4" fill="#F7F3E8" stroke="#2C4A73"/><text x="203" y="80.6" font-size="6.6" text-anchor="middle" fill="#2C4A73">3</text></g>
+
+    <path d="M281,94 L281,64" fill="none" stroke="#2C4A73" stroke-width="1.2" marker-start="url(#arB)" marker-end="url(#arB)"/>
+    <g><circle cx="274" cy="78" r="6.4" fill="#F7F3E8" stroke="#2C4A73"/><text x="274" y="80.6" font-size="6.6" text-anchor="middle" fill="#2C4A73">4</text></g>
+
+    <path d="M326,258 L342,258" fill="none" stroke="#BF3A2B" stroke-width="2" marker-end="url(#arR)"/>
+    <g><circle cx="334" cy="250" r="6.4" fill="#F7F3E8" stroke="#BF3A2B"/><text x="334" y="252.6" font-size="6.6" text-anchor="middle" fill="#BF3A2B">5</text></g>
+
+    <path d="M326,110 L350,110" fill="none" stroke="#15171B" stroke-width="1" marker-end="url(#ar)"/>
+    <g><circle cx="338" cy="103" r="6.4" fill="#F7F3E8" stroke="#15171B"/><text x="338" y="105.6" font-size="6.6" text-anchor="middle">6</text></g>
+
+    <path d="M350,130 L326,130" fill="none" stroke="#1D6A58" stroke-width="1" stroke-dasharray="3 2.5" marker-end="url(#arG)"/>
+    <g><circle cx="338" cy="137" r="6.4" fill="#F7F3E8" stroke="#1D6A58"/><text x="338" y="139.6" font-size="6.6" text-anchor="middle" fill="#1D6A58">7</text></g>
+
+    <path d="M415,144 L415,166" fill="none" stroke="#15171B" stroke-width="1" marker-end="url(#ar)"/>
+    <g><circle cx="421" cy="155" r="6.4" fill="#F7F3E8" stroke="#15171B"/><text x="421" y="157.6" font-size="6.6" text-anchor="middle">8</text></g>
+
+    <path d="M480,195 L490,195" fill="none" stroke="#15171B" stroke-width="1" marker-end="url(#ar)"/>
+    <g><circle cx="485" cy="188" r="6.4" fill="#F7F3E8" stroke="#15171B"/><text x="485" y="190.6" font-size="6.6" text-anchor="middle">9</text></g>
+
+    <path d="M596,274 L606,274" fill="none" stroke="#15171B" stroke-width="1" marker-end="url(#ar)"/>
+    <g><circle cx="601" cy="267" r="6.4" fill="#F7F3E8" stroke="#15171B"/><text x="601" y="269.6" font-size="6.6" text-anchor="middle">10</text></g>
+
+    <path d="M708,274 L714,274 L714,304 L326,304" fill="none" stroke="#BF3A2B" stroke-width="1.2" stroke-dasharray="4 2.5" marker-end="url(#arR)"/>
+    <g><circle cx="520" cy="298" r="6.4" fill="#F7F3E8" stroke="#BF3A2B"/><text x="520" y="300.6" font-size="6.6" text-anchor="middle" fill="#BF3A2B">11</text></g>
+
+    <path d="M708,119 L716,119 L716,490 L8,490 L8,288 L12,288" fill="none" stroke="#2C4A73" stroke-width="1" stroke-dasharray="3 2.5" marker-end="url(#arB)"/>
+    <g><circle cx="400" cy="484" r="6.4" fill="#F7F3E8" stroke="#2C4A73"/><text x="400" y="486.6" font-size="6.6" text-anchor="middle" fill="#2C4A73">12</text></g>
+  </svg>
+
+  <div class="legend" style="margin-top:3mm">
+    <div><b>① 画像 / 回答 / 承認</b> 本人の 3 操作だけが Orchestrator に入る</div>
+    <div><b>② SSE</b> 状態・質問・確認・完了通知をブラウザへストリーム</div>
+    <div><b>③ 視覚読取</b> 画像 + JSON スキーマ → <span class="mono">NoticeExtraction</span></div>
+    <div><b>④ 操作判断</b> 目的 + 出どころ + 画面 → <span class="mono">actions[]</span></div>
+    <div><b>⑤ Daytona ライフサイクル</b> create / upload / computerUse / exec / delete</div>
+    <div><b>⑥ 1 手の操作</b> <span class="mono">act.mjs</span> をサンドボックス内で実行</div>
+    <div><b>⑦ 観察</b> <span class="mono">[eN]</span> 要素一覧 + スクリーンショットを返す</div>
+    <div><b>⑧ CDP</b> 常駐 Chromium に接続して入力・クリック</div>
+    <div><b>⑨ ローカル HTTP</b> サンドボックス内の申請サイトだけを開く</div>
+    <div><b>⑩ 照合</b> 入力記録とサイト自身の画面・受領データを突き合わせ</div>
+    <div><b>⑪ 合否</b> <span class="mono">exit 0 / 1</span> を状態機械へ返す</div>
+    <div><b>⑫ noVNC</b> 署名付き URL で家族に見守り画面を配信</div>
+  </div>
+
+  <div class="grid3" style="margin-top:4mm">
+    <div class="callout"><b>Isolation</b><br>依頼ごとにマシンを作り、Cookie・ファイル・クリップボードを利用者間で共有しない。終了時は必ず <span class="mono">delete()</span>。</div>
+    <div class="callout" style="border-color:var(--green)"><b class="green">Proof, not self-report</b><br>LLM の「できました」を信じない。サイトが表示した確認画面と、サイトが受け取ったデータで照合する。</div>
+    <div class="callout" style="border-color:var(--blue)"><b class="blue">No egress by default</b><br>申請先はサンドボックス内の <span class="mono">127.0.0.1:8090</span>。外部サイトは <span class="mono">TARGET_URL</span> 明示時だけ。</div>
+  </div>
+
+  <div class="pfoot"><span>ARCHITECTURE · TRUST BOUNDARY</span><span>02</span></div>
+</section>
+
+<!-- ============================== 03 SEQUENCE ============================== -->
+<section class="page">
+  <div class="phead"><div class="l">03 · Runtime Sequence</div><div class="r">03 / 07</div></div>
+  <div class="pagettl">
+    <div>
+      <div class="secnum">One filing, end to end</div>
+      <h2>読む → 隔離する → 操作する →<br>承認する → 証明する。</h2>
+    </div>
+    <div class="small" style="width:58mm;text-align:right">
+      各メッセージは実装上の関数・API に対応する。番号は <span class="mono">AI_REVIEW.md</span> の実行証跡と同順。
+    </div>
+  </div>
+
+  <svg viewBox="0 0 720 515" role="img" aria-label="Runtime sequence diagram">
+    <defs>
+      <marker id="sq" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#15171B"/></marker>
+      <marker id="sqG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1D6A58"/></marker>
+      <marker id="sqB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2C4A73"/></marker>
+    </defs>
+
+    <!-- participants -->
+    <rect x="10" y="4" width="100" height="28" fill="#FFFFFF" stroke="#15171B"/>
+    <text x="60" y="22" font-size="8" font-weight="700" text-anchor="middle">本人</text>
+    <rect x="178" y="4" width="124" height="28" fill="#F3E0DB" stroke="#BF3A2B"/>
+    <text x="240" y="22" font-size="8" font-weight="700" text-anchor="middle">Orchestrator</text>
+    <rect x="358" y="4" width="124" height="28" fill="#DEE6F0" stroke="#2C4A73"/>
+    <text x="420" y="22" font-size="8" font-weight="700" text-anchor="middle">Nosana / Vertex</text>
+    <rect x="550" y="4" width="140" height="28" fill="#FDF9F1" stroke="#BF3A2B"/>
+    <text x="620" y="22" font-size="8" font-weight="700" text-anchor="middle">Daytona Sandbox</text>
+
+    <line x1="60" y1="32" x2="60" y2="505" stroke="#C9C2B2" stroke-dasharray="2 3"/>
+    <line x1="240" y1="32" x2="240" y2="505" stroke="#C9C2B2" stroke-dasharray="2 3"/>
+    <line x1="420" y1="32" x2="420" y2="505" stroke="#C9C2B2" stroke-dasharray="2 3"/>
+    <line x1="610" y1="32" x2="610" y2="505" stroke="#C9C2B2" stroke-dasharray="2 3"/>
+
+    <!-- messages -->
+    <text x="66" y="55" font-size="6.8" fill="#15171B">① 通知画像（1 枚）</text>
+    <line x1="60" y1="60" x2="240" y2="60" stroke="#15171B" marker-end="url(#sq)"/>
+
+    <text x="246" y="78" font-size="6.8" fill="#15171B">② 画像 + JSON スキーマ</text>
+    <line x1="240" y1="83" x2="420" y2="83" stroke="#15171B" marker-end="url(#sq)"/>
+
+    <text x="246" y="101" font-size="6.8" fill="#15171B">③ noticeType / 期限 / 3 行 / 本人情報</text>
+    <line x1="420" y1="106" x2="240" y2="106" stroke="#1D6A58" marker-end="url(#sqG)"/>
+
+    <text x="246" y="124" font-size="6.8" fill="#15171B">④ create / upload / computerUse / browser</text>
+    <line x1="240" y1="129" x2="610" y2="129" stroke="#15171B" marker-end="url(#sq)"/>
+
+    <text x="470" y="147" font-size="6.8" fill="#2C4A73">⑤ signed noVNC URL</text>
+    <line x1="610" y1="152" x2="240" y2="152" stroke="#2C4A73" stroke-dasharray="3 2" marker-end="url(#sqB)"/>
+
+    <rect x="212" y="170" width="470" height="136" fill="none" stroke="#BF3A2B" stroke-dasharray="3 2"/>
+    <rect x="212" y="163" width="54" height="13" fill="#F7F3E8" stroke="none"/>
+    <text x="216" y="173" font-size="6.2" fill="#BF3A2B" font-family="SF Mono, Menlo, monospace">loop 最大 30 手</text>
+
+    <text x="246" y="190" font-size="6.8" fill="#15171B">⑥ act.mjs（観察）</text>
+    <line x1="240" y1="195" x2="610" y2="195" stroke="#15171B" marker-end="url(#sq)"/>
+
+    <text x="440" y="212" font-size="6.8" fill="#1D6A58">⑦ [eN] 要素一覧 + PNG</text>
+    <line x1="610" y1="217" x2="240" y2="217" stroke="#1D6A58" stroke-dasharray="3 2" marker-end="url(#sqG)"/>
+
+    <text x="246" y="235" font-size="6.8" fill="#15171B">⑧ 目的 + 出どころ + 未入力 + 画面</text>
+    <line x1="240" y1="240" x2="420" y2="240" stroke="#15171B" marker-end="url(#sq)"/>
+
+    <text x="246" y="258" font-size="6.8" fill="#1D6A58">⑨ {"thought","actions":[…]}</text>
+    <line x1="420" y1="263" x2="240" y2="263" stroke="#1D6A58" marker-end="url(#sqG)"/>
+
+    <text x="246" y="282" font-size="6.8" fill="#15171B">⑩ act.mjs（入力・選択・クリック）  ← 4 ゲート通過後のみ</text>
+    <line x1="240" y1="287" x2="610" y2="287" stroke="#15171B" marker-end="url(#sq)"/>
+
+    <rect x="16" y="310" width="260" height="58" fill="none" stroke="#A97E24" stroke-dasharray="3 2"/>
+    <rect x="16" y="303" width="66" height="13" fill="#F7F3E8" stroke="none"/>
+    <text x="20" y="313" font-size="6.2" fill="#A97E24" font-family="SF Mono, Menlo, monospace">opt 本人しか分からない</text>
+
+    <text x="66" y="334" font-size="6.8" fill="#15171B">⑪ 質問（最大 3 問）</text>
+    <line x1="240" y1="339" x2="60" y2="339" stroke="#A97E24" marker-end="url(#sq)"/>
+    <text x="66" y="357" font-size="6.8" fill="#15171B">回答 → Source(origin=本人)</text>
+    <line x1="60" y1="362" x2="240" y2="362" stroke="#A97E24" marker-end="url(#sq)"/>
+
+    <text x="66" y="389" font-size="6.8" fill="#BF3A2B">⑫ 読み上げ + 「はい？」</text>
+    <line x1="240" y1="394" x2="60" y2="394" stroke="#BF3A2B" marker-end="url(#sq)"/>
+
+    <text x="66" y="412" font-size="6.8" fill="#15171B">はい（承認）</text>
+    <line x1="60" y1="417" x2="240" y2="417" stroke="#15171B" marker-end="url(#sq)"/>
+
+    <text x="246" y="435" font-size="6.8" fill="#BF3A2B">⑬ 最終クリック（送信）</text>
+    <line x1="240" y1="440" x2="610" y2="440" stroke="#BF3A2B" stroke-width="1.4" marker-end="url(#sq)"/>
+
+    <text x="480" y="459" font-size="6.6" fill="#4C525C" text-anchor="end">HTTP 127.0.0.1:8090 → 完了画面 + 受付番号</text>
+    <path d="M610,452 L640,452 L640,464 L610,464" fill="none" stroke="#4C525C"/>
+    <path d="M640,458 L610,458" fill="none" stroke="#4C525C" marker-end="url(#sq)"/>
+
+    <text x="246" y="481" font-size="6.8" fill="#15171B">⑭ verify.mjs（expected.json と照合）</text>
+    <line x1="240" y1="486" x2="610" y2="486" stroke="#15171B" marker-end="url(#sq)"/>
+    <text x="530" y="501" font-size="6.6" fill="#1D6A58" text-anchor="end">exit 0 → 受付番号を通知 → ⑮ delete()</text>
+  </svg>
+
+  <div class="secnum" style="margin-top:4mm">State machine — implemented in src/flow.ts</div>
+  <div style="display:flex;align-items:center;gap:1.2mm;flex-wrap:nowrap;margin-top:2mm">
+    <span class="tag" style="font-size:6.4pt;padding:1.4mm 2.2mm">READING</span><span class="mono tiny">→</span>
+    <span class="tag" style="font-size:6.4pt;padding:1.4mm 2.2mm">SANDBOX_READY</span><span class="mono tiny">→</span>
+    <span class="tag" style="font-size:6.4pt;padding:1.4mm 2.2mm">FILLING</span><span class="mono tiny">⇄</span>
+    <span class="tag" style="font-size:6.4pt;padding:1.4mm 2.2mm">ASKING</span><span class="mono tiny">→</span>
+    <span class="tag red" style="font-size:6.4pt;padding:1.4mm 2.2mm">CONFIRMING</span><span class="mono tiny">→</span>
+    <span class="tag" style="font-size:6.4pt;padding:1.4mm 2.2mm">VERIFYING</span><span class="mono tiny">→</span>
+    <span class="tag green" style="font-size:6.4pt;padding:1.4mm 2.2mm">DONE</span>
+  </div>
+  <div class="grid3" style="margin-top:4mm">
+    <div class="card"><h3 class="red">「いいえ」</h3><div class="tiny"><span class="mono">CONFIRMING → CANCELLED</span>。最終クリックをせず、サイトにも何も送らない。破棄だけを行う。</div></div>
+    <div class="card"><h3>失敗</h3><div class="tiny">読取不能・起動失敗・疎通失敗・30 手超過・モデル無しは <span class="mono">error</span>。どの経路でも <span class="mono">finally</span> で <span class="mono">dispose()</span>。</div></div>
+    <div class="card"><h3>時間の上限</h3><div class="tiny">回答・承認は 10 分で打ち切り。人が離席しても隔離マシンを占有し続けない。</div></div>
+  </div>
+
+  <div class="grid2" style="margin-top:4mm">
+    <div>
+      <div class="secnum">What the operator actually sees — act.mjs output</div>
+      <div class="code">[e1] link "トップ"
+[e7] link "水道料金・下水道使用料の口座振替申込"
+[e12] text "お客様番号" value="1234567890" hint="ハイフンなし"
+[e18] text "生年月日 ＞ 年" value="" hint="例: 昭和23年"
+[e19] select "金融機関" options=["ひばり野銀行","みどり信用金庫"]
+[e24] button "確認へ進む"
+...
+画面の文字・入力値・選択肢・エラーを 1 枚のテキストに落とす
+（スクリーンショットは家族に見せるためだけに使う）</div>
+    </div>
+    <div>
+      <div class="secnum">What the model returns — one step only</div>
+      <div class="code">{"thought": "水道の口座振替を開く",
+ "actions": [{"action": "click", "ref": "e7"}]}
+
+{"thought": "お客様番号を転記する",
+ "actions": [{"action": "fill", "ref": "e12",
+              "value": "1234567890",
+              "from": "お客様番号"}]}
+
+<span class="c">// from が sources に無ければ、この操作は実行されない</span>
+<span class="c">// 最終ボタンは submit / click のどちらでも承認ゲートを通る</span></div>
+      <div class="tiny" style="margin-top:2mm">画面が変われば ref は振り直される。モデルは毎手、最新の一覧から選ぶ。固定シナリオを持たない。</div>
+    </div>
+  </div>
+
+  <div class="pfoot"><span>SEQUENCE · STATE MACHINE</span><span>03</span></div>
+</section>
+
+<!-- ============================== 04 GATES ============================== -->
+<section class="page">
+  <div class="phead"><div class="l">04 · Safety Invariants</div><div class="r">04 / 07</div></div>
+  <div class="pagettl">
+    <div>
+      <div class="secnum">Four gates the model cannot bypass</div>
+      <h2>モデルは提案する。コードが拒否し、<br>検証器が合否を決める。</h2>
+    </div>
+    <div class="small" style="width:62mm;text-align:right">
+      LLM の指示をそのまま実行すると、存在しない値の入力・入れ忘れ・誤送信が起きる。
+      本実装はその 3 つをコードで封じ、4 つ目で証明する。
+    </div>
+  </div>
+
+  <div class="grid4">
+    <div class="card" style="border-color:var(--red)">
+      <div class="metric" style="color:var(--red)">01</div>
+      <h3 style="margin-top:1.5mm">Provenance<br><span class="small">出どころ</span></h3>
+      <div class="tiny">入力・選択には <span class="mono">from</span>（本人情報の項目名）が必須。推測値は入力しない。</div>
+      <div class="tiny mono" style="margin-top:1.5mm;color:var(--red)">operator.ts:215-229</div>
+      <div class="tiny" style="margin-top:1.2mm"><b>違反時:</b> その操作だけ破棄し、履歴に理由を残す</div>
+    </div>
+    <div class="card" style="border-color:var(--red)">
+      <div class="metric" style="color:var(--red)">02</div>
+      <h3 style="margin-top:1.5mm">Completeness<br><span class="small">入れ忘れ</span></h3>
+      <div class="tiny">本人情報は「入力した」か「欄が無いと理由付きで申告」するまで送信不可。</div>
+      <div class="tiny mono" style="margin-top:1.5mm;color:var(--red)">operator.ts:132-135, 197-202</div>
+      <div class="tiny" style="margin-top:1.2mm"><b>違反時:</b> 送信を止め、入力へ戻す</div>
+    </div>
+    <div class="card" style="border-color:var(--red)">
+      <div class="metric" style="color:var(--red)">03</div>
+      <h3 style="margin-top:1.5mm">Approval<br><span class="small">本人承認</span></h3>
+      <div class="tiny">最終ボタンは「はい」の後だけ。<span class="mono">click</span> と偽っても同じゲートを通す。</div>
+      <div class="tiny mono" style="margin-top:1.5mm;color:var(--red)">operator.ts:193-213</div>
+      <div class="tiny" style="margin-top:1.2mm"><b>違反時:</b> 送信せず <span class="mono">CANCELLED</span></div>
+    </div>
+    <div class="card" style="border-color:var(--green)">
+      <div class="metric" style="color:var(--green)">04</div>
+      <h3 style="margin-top:1.5mm">Verification<br><span class="small">独立検証</span></h3>
+      <div class="tiny">サイト自身の確認画面・受領データ・完了画面を照合。LLM に合否を判定させない。</div>
+      <div class="tiny mono" style="margin-top:1.5mm;color:var(--green)">verify.mjs:21-49</div>
+      <div class="tiny" style="margin-top:1.2mm"><b>違反時:</b> <span class="mono">exit 1</span> + 家族に警告</div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:5mm">
+    <div>
+      <div class="secnum">Gate 1 — provenance</div>
+      <div class="code"><span class="c">// operator.ts:215-229 — no provenance, no input</span>
+<span class="y">const</span> runnable = actions.filter((a) =&gt; {
+  <span class="y">const</span> el = element(obs, a.ref);
+  <span class="y">const</span> noSource =
+    !(a.from &amp;&amp; a.from <span class="y">in</span> sources);
+  <span class="y">if</span> (isInput &amp;&amp; !consent &amp;&amp; noSource) {
+    lines.push(<span class="g">`「${el.name}」は出どころが無い`</span>);
+    <span class="y">return</span> <span class="r">false</span>;  <span class="c">// ← 実行させない</span>
+  }
+  <span class="y">return</span> <span class="r">true</span>;
+});</div>
+
+      <div class="secnum" style="margin-top:4mm">Gate 2 — completeness</div>
+      <div class="code"><span class="c">// operator.ts:197-202 — no silent omission</span>
+<span class="y">const</span> missing = unresolved();
+<span class="y">if</span> (missing.length) {
+  history.push(<span class="g">`本人情報「`</span>
+    + missing.join(<span class="g">"、"</span>)
+    + <span class="g">`」が未入力・未申告`</span>);
+  <span class="y">continue</span>;  <span class="c">// ← 最終クリックさせない</span>
+}</div>
+    </div>
+
+    <div>
+      <div class="secnum">Gate 3 — human approval</div>
+      <div class="code"><span class="c">// operator.ts:203-213 — save proof, then ask</span>
+<span class="y">await</span> act(runner, [], <span class="g">"confirm-page.txt"</span>);
+<span class="y">const</span> ok = <span class="y">await</span> hooks.confirm(
+  summarize(entered), obs.screenshot);
+<span class="y">if</span> (!ok) <span class="y">return</span> { status: <span class="g">"cancelled"</span> };
+obs = <span class="y">await</span> act(runner,
+  [{ action: <span class="g">"click"</span>, ref: finalClick.ref }],
+  <span class="g">"done-page.txt"</span>);</div>
+
+      <div class="secnum" style="margin-top:4mm">Gate 4 — independent verifier</div>
+      <div class="code"><span class="c">// verify.mjs — no model in the loop</span>
+check(confirmPage != <span class="y">null</span>, <span class="g">"確認画面を記録"</span>);
+<span class="y">for</span> (<span class="y">const</span> { field, value, from } <span class="y">of</span> entered) {
+  check(from <span class="y">in</span> sources, <span class="g">`出どころ: ${from}`</span>);
+  check(confirmPage.includes(value),
+        <span class="g">`確認画面に「${value}」`</span>);
+}
+check(donePage.test(<span class="r">/完了|受付|到達/</span>),
+      <span class="g">"完了画面"</span>);
+<span class="c">// ... 8 checks vs site-received.json ...</span>
+process.exit(failed === <span class="r">0</span> ? <span class="r">0</span> : <span class="r">1</span>);</div>
+    </div>
+  </div>
+
+  <div class="rule"></div>
+
+  <div class="grid2">
+    <div>
+      <div class="secnum">What this changes</div>
+      <table class="t">
+        <tr><th style="width:34mm">よくある実装</th><th>本作品</th></tr>
+        <tr><td>LLM が値を考えて入力する</td><td>値の出どころを <span class="mono">Source</span> として保持し、無い値は拒否</td></tr>
+        <tr><td>「完了しました」とモデルが言う</td><td>サイトの確認画面・受領データ・完了画面で照合</td></tr>
+        <tr><td>確認は「送信しますか？」の 1 クリック</td><td>出どころごとに読み上げ、<b>はい</b> の後だけ最終クリック</td></tr>
+        <tr><td>失敗すると状態が残る</td><td>成功・失敗・キャンセルすべてでサンドボックスを破棄</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="secnum">Why it matters for this domain</div>
+      <p class="small" style="margin-bottom:2mm">行政手続きは「間違って送る」ことのコストが高い。とくに高齢者の代行では、家族も本人も、送った内容を後から検証できない。</p>
+      <p class="small">本実装は、<b>送信前</b>に 3 つ（出どころ・入れ忘れ・承認）を止め、<b>送信後</b>に 1 つ（独立検証）で証明する。この 4 点はモデルやプロバイダーを差し替えても変わらない。</p>
+      <div class="callout" style="margin-top:3mm"><b>The model proposes. The code disposes.</b><br>この一文がアーキテクチャの要約であり、単なるチャットボット / RPA との差分。</div>
+    </div>
+  </div>
+
+  <div class="pfoot"><span>SAFETY INVARIANTS · 4 GATES</span><span>04</span></div>
+</section>
+
+<!-- ============================== 05 SPONSORS ============================== -->
+<section class="page">
+  <div class="phead"><div class="l">05 · Sponsored Product Usage</div><div class="r">05 / 07</div></div>
+  <div class="pagettl">
+    <div>
+      <div class="secnum">Not a logo — the runtime and the inference</div>
+      <h2>Daytona が実行基盤の中核。<br>Nosana が個人情報を守る推論基盤。</h2>
+    </div>
+    <div class="small" style="width:60mm;text-align:right">
+      どちらも「無くても動く飾り」ではない。Daytona が無ければ隔離実行が成立せず、
+      Nosana が無ければ個人情報を外部 API に出さない要件を満たせない。
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1.55fr 1fr;gap:5mm">
+
+    <!-- Daytona -->
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--ink);padding-bottom:1.4mm">
+        <div style="font-size:15pt;font-weight:700;letter-spacing:-.02em">DAYTONA</div>
+        <span class="tag red">CORE RUNTIME</span>
+      </div>
+      <div class="small" style="margin-top:2mm">依頼ごとに <b>完全なマシン</b> を作り、画面付きデスクトップでブラウザを操作し、1 手ごとにコマンドを実行し、最後に破棄する。ライフサイクル 8 段階すべてで SDK を使用。</div>
+
+      <table class="t" style="margin-top:3mm">
+        <tr><th style="width:5mm">#</th><th style="width:30mm">Lifecycle</th><th>Daytona API</th><th style="width:23mm">Code</th></tr>
+        <tr><td class="mono red">1</td><td>Create</td><td class="mono" style="font-size:6.4pt">new Daytona().create({ snapshot | language, envVars })</td><td class="mono tiny">sandbox.ts:124</td></tr>
+        <tr><td class="mono red">2</td><td>Provision</td><td class="mono" style="font-size:6.4pt">sandbox.fs.uploadFile(Buffer, path)</td><td class="mono tiny">sandbox.ts:140</td></tr>
+        <tr><td class="mono red">3</td><td>Desktop</td><td class="mono" style="font-size:6.4pt">sandbox.computerUse.start()</td><td class="mono tiny">sandbox.ts:185</td></tr>
+        <tr><td class="mono red">4</td><td>Live view</td><td class="mono" style="font-size:6.4pt">sandbox.getSignedPreviewUrl(6080, 3600)</td><td class="mono tiny">sandbox.ts:193</td></tr>
+        <tr><td class="mono red">5</td><td>Resident</td><td class="mono" style="font-size:6.4pt">process.createSession() / executeSessionCommand()</td><td class="mono tiny">sandbox.ts:247</td></tr>
+        <tr><td class="mono red">6</td><td>Per step</td><td class="mono" style="font-size:6.4pt">process.executeCommand("node agent/act.mjs …", 120)</td><td class="mono tiny">sandbox.ts:241</td></tr>
+        <tr><td class="mono red">7</td><td>Artifacts</td><td class="mono" style="font-size:6.4pt">fs.uploadFile(expected.json) / fs.downloadFile()</td><td class="mono tiny">sandbox.ts:253</td></tr>
+        <tr><td class="mono red">8</td><td>Dispose</td><td class="mono" style="font-size:6.4pt">sandbox.delete() — every exit path</td><td class="mono tiny">sandbox.ts:265</td></tr>
+      </table>
+
+      <div style="display:flex;align-items:center;gap:3mm;margin-top:3mm">
+        <div style="flex:1"><div class="bar"><i style="width:100%"></i></div></div>
+        <div class="mono" style="font-size:6.4pt;letter-spacing:.08em">8 / 8 LIFECYCLE STAGES</div>
+      </div>
+
+      <div class="grid2" style="margin-top:3mm">
+        <div class="card" style="padding:2.4mm"><h3 style="font-size:8pt">Why it must be Daytona</h3><div class="tiny">他人の個人情報と混ざらない完全マシン。休止・再開でログイン状態を保てる。家族の PC に認証情報を置かず、処理後に環境ごと破棄できる。</div></div>
+        <div class="card" style="padding:2.4mm"><h3 style="font-size:8pt">Constraint handling</h3><div class="tiny">Tier 1/2 の外向き制限に合わせ、既定の申請先を<b>マシン内</b>に置く。日本語フォント・ブラウザはスナップショットで事前導入。</div></div>
+      </div>
+    </div>
+
+    <!-- Nosana -->
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--ink);padding-bottom:1.4mm">
+        <div style="font-size:15pt;font-weight:700;letter-spacing:-.02em">NOSANA</div>
+        <span class="tag blue">GPU INFERENCE</span>
+      </div>
+      <div class="small" style="margin-top:2mm">通知画像の読取と、ブラウザ操作の次の 1 手の判断。どちらも個人情報を扱うため、OSS モデルを自分で動かせる Nosana を第一候補にした。</div>
+
+      <div class="card" style="margin-top:3mm;padding:2.8mm;border-left:2.5pt solid var(--blue)">
+        <div class="tag blue">ROLE 1</div>
+        <h3 style="margin-top:1.2mm;font-size:9pt">Vision reading</h3>
+        <div class="tiny">通知画像 → <span class="mono">NoticeExtraction</span>。3 行要約・期限・氏名/住所/生年月日/番号を、原文と confidence 付きで返す。</div>
+        <div class="tiny mono" style="margin-top:1mm;color:var(--blue)">reader.ts:104-118 · prompt:18-32</div>
+      </div>
+
+      <div class="card" style="margin-top:2.5mm;padding:2.8mm;border-left:2.5pt solid var(--blue)">
+        <div class="tag blue">ROLE 2</div>
+        <h3 style="margin-top:1.2mm;font-size:9pt">Action decision</h3>
+        <div class="tiny">目的・出どころ・未入力項目・直近履歴・画面の <span class="mono">[eN]</span> 一覧 → 次の 1 手の JSON。固定シナリオではない。</div>
+        <div class="tiny mono" style="margin-top:1mm;color:var(--blue)">operator.ts:84-122 · operate:124</div>
+      </div>
+
+      <div class="card" style="margin-top:2.5mm;padding:2.8mm;background:var(--green-soft);border-color:var(--green)">
+        <div class="tag green">PRIVACY</div>
+        <h3 style="margin-top:1.2mm;font-size:9pt">PII never leaves the trust boundary</h3>
+        <div class="tiny">通知画像と転記値は商用 API に送らない。ログは 4 桁以上の数字列を伏せ、処理後にサンドボックスを破棄する。</div>
+        <div class="tiny mono" style="margin-top:1mm;color:var(--green)">flow.ts:60-62 (redact) · flow.ts:150-158</div>
+      </div>
+
+      <div class="card" style="margin-top:2.5mm;padding:2.4mm">
+        <div class="tiny"><b>Operational details</b><br>
+        OpenAI-compatible <span class="mono">/chat/completions</span> · <span class="mono">temperature 0</span> · JSON mode · timeout / hedge · <span class="mono">OPERATOR_AI_PROVIDER</span> で reader と operator を別プロバイダーにできる（ハイブリッド）。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rule"></div>
+
+  <div class="grid3">
+    <div><div class="metric red">8</div><div class="tiny" style="margin-top:1mm">Daytona のライフサイクル段階。<br>create から delete まで、すべてコード上の呼び出しがある。</div></div>
+    <div><div class="metric blue">2</div><div class="tiny" style="margin-top:1mm">Nosana の推論ロール。<br>視覚読取と操作判断を、同じ OpenAI 互換クライアントで扱う。</div></div>
+    <div><div class="metric green">0</div><div class="tiny" style="margin-top:1mm">個人情報を送る商用 API の数。<br>Nosana の OSS モデル、またはセルフホスト推論で処理する。</div></div>
+  </div>
+
+  <div class="pfoot"><span>DAYTONA · NOSANA</span><span>05</span></div>
+</section>
+
+<!-- ============================== 06 VERIFICATION ============================== -->
+<section class="page">
+  <div class="phead"><div class="l">06 · Verification &amp; Reproduction</div><div class="r">06 / 07</div></div>
+  <div class="pagettl">
+    <div>
+      <div class="secnum">Completeness, measured</div>
+      <h2>「できました」ではなく、<br><span class="mono green">exit 0</span> で示す。</h2>
+    </div>
+    <div class="small" style="width:58mm;text-align:right">
+      検証はモデルを使わない。申請サイト自身が表示した確認画面・完了画面と、
+      サイトが実際に受け取ったデータだけを根拠にする。
+    </div>
+  </div>
+
+  <div class="grid4" style="margin-bottom:5mm">
+    <div class="card" style="text-align:center;padding:3mm 2mm"><div class="metric">21</div><div class="tiny" style="margin-top:1mm">テスト総数</div></div>
+    <div class="card" style="text-align:center;padding:3mm 2mm"><div class="metric green">19</div><div class="tiny" style="margin-top:1mm">pass</div></div>
+    <div class="card" style="text-align:center;padding:3mm 2mm"><div class="metric red">0</div><div class="tiny" style="margin-top:1mm">fail</div></div>
+    <div class="card" style="text-align:center;padding:3mm 2mm"><div class="metric gold">2</div><div class="tiny" style="margin-top:1mm">skip（E2E ゲート）</div></div>
+  </div>
+
+  <div class="grid2">
+    <div>
+      <div class="secnum">Run it</div>
+      <div class="code"><span class="c"># Node.js 23.6+</span>
+npm install
+npm run desktop:build   <span class="c"># 初回のみ / Docker Desktop</span>
+npm start               <span class="c"># http://localhost:8787</span>
+
+<span class="c"># 画面の「見本の請求書で試す」を押す</span>
+<span class="c"># または Daytona で:</span>
+secret run DAYTONA_API_KEY -- npm start</div>
+
+      <div class="secnum" style="margin-top:4mm">What you should see</div>
+      <div class="code"><span class="g">✔</span> 送信前の確認画面を記録した
+<span class="g">✔</span> 「氏名」の値「…」の出どころ: 氏名（書類）
+<span class="g">✔</span> 確認画面に「氏名」=「…」がある
+<span class="g">✔</span> 書類の情報を入力も申告もしていない項目は無い
+<span class="g">✔</span> 送信後の画面が完了を示している
+<span class="g">✔</span> 完了画面に番号「…」がある
+<span class="g">✔</span> 申請サイトが受け取った内容に「氏名」=「…」がある
+<span class="g">✔</span> 申請サイトが発行した受付番号と一致する
+合格: N 項目
+<span class="c">exit 0</span></div>
+
+      <div class="callout" style="margin-top:3.5mm"><b>再現性の境界</b><br>通常の <span class="mono">npm test</span> は外部キー不要（21 件中 19 件）。E2E 2 件は <span class="mono">E2E=1</span> を明示したときだけ走り、Docker / GCP で実機確認済み。</div>
+    </div>
+
+    <div>
+      <div class="secnum">Independent verifier — 8 checks</div>
+      <table class="t">
+        <tr><th style="width:5mm">#</th><th>確かめること</th><th style="width:34mm">根拠</th></tr>
+        <tr><td class="mono red">1</td><td>送信直前の確認画面を記録した</td><td class="mono tiny">confirm-page.txt</td></tr>
+        <tr><td class="mono red">2</td><td>入力した欄が 1 件以上ある</td><td class="mono tiny">expected.json</td></tr>
+        <tr><td class="mono red">3</td><td>すべての入力値に出どころがある</td><td class="mono tiny">entered[].from ∈ sources</td></tr>
+        <tr><td class="mono red">4</td><td>入力値が確認画面に出ている</td><td class="mono tiny">confirm-page.txt</td></tr>
+        <tr><td class="mono red">5</td><td>書類の情報を入れ忘れていない</td><td class="mono tiny">sources vs notApplicable</td></tr>
+        <tr><td class="mono red">6</td><td>送信後の画面が完了を示している</td><td class="mono tiny">done-page.txt</td></tr>
+        <tr><td class="mono red">7</td><td>報告した受付番号が完了画面にある</td><td class="mono tiny">done-page.txt</td></tr>
+        <tr><td class="mono red">8</td><td>サイトが受け取った値・番号と一致する</td><td class="mono tiny">site-received.json</td></tr>
+      </table>
+
+      <div class="secnum" style="margin-top:4mm">Verification layers</div>
+      <table class="t">
+        <tr><th style="width:24mm">Layer</th><th>Command / evidence</th><th style="width:18mm">Status</th></tr>
+        <tr><td>Unit / guard</td><td class="mono tiny">npm test</td><td><span class="tag green">19 pass</span></td></tr>
+        <tr><td>E2E (Docker)</td><td class="mono tiny">E2E=1 SANDBOX_PROVIDER=docker npm test</td><td><span class="tag green">verified</span></td></tr>
+        <tr><td>E2E (GCP)</td><td class="mono tiny">E2E=1 SANDBOX_PROVIDER=gcp npm test</td><td><span class="tag green">verified</span></td></tr>
+        <tr><td>Live provider</td><td class="mono tiny">Vertex AI Gemini（読取・操作）</td><td><span class="tag green">verified</span></td></tr>
+        <tr><td>Live external</td><td class="mono tiny">佐倉市「電子申請 体験」</td><td><span class="tag green">receipt</span></td></tr>
+        <tr><td>Daytona / Nosana</td><td class="mono tiny">実機キー未取得</td><td><span class="tag red">not live</span></td></tr>
+      </table>
+
+      <div class="small" style="margin-top:3mm"><b>テストの内訳</b>: verify 12 / operator 4 / reader 3 / flow 2。operator の 4 件は、出どころの無い入力・入れ忘れ送信・承認なしクリック・同意チェックの例外を直接叩く。</div>
+    </div>
+  </div>
+
+  <div class="pfoot"><span>VERIFICATION · REPRODUCTION</span><span>06</span></div>
+</section>
+
+<!-- ============================== 07 LEDGER ============================== -->
+<section class="page">
+  <div class="phead"><div class="l">07 · Verification Ledger &amp; Evidence Map</div><div class="r">07 / 07</div></div>
+  <div class="pagettl">
+    <div>
+      <div class="secnum">What is proven / what is not</div>
+      <h2>未検証を、検証済みと書かない。</h2>
+    </div>
+    <div class="small" style="width:62mm;text-align:right">
+      AI 審査で最も危険なのは、実機で確かめていないことを「動作する」と主張すること。
+      本資料はコード上の証拠と、実機の証拠を分けて記載する。
+    </div>
+  </div>
+
+  <table class="t">
+    <tr><th style="width:44mm">項目</th><th style="width:28mm">状態</th><th>根拠 / 補足</th></tr>
+    <tr><td>Vertex AI での読取・操作</td><td><span class="tag green">実機確認済み</span></td><td>README 制約節。Gemini で通知画像を読み、申請サイトを操作。</td></tr>
+    <tr><td>Docker デスクトップでの E2E</td><td><span class="tag green">実機確認済み</span></td><td>「はい」で送信し、検証 <span class="mono">exit 0</span> と受付番号を取得。</td></tr>
+    <tr><td>GCP（asia-northeast1）での E2E</td><td><span class="tag green">実機確認済み</span></td><td>VM 上のコンテナで同じ構成。SSH トンネル越しの noVNC。</td></tr>
+    <tr><td>佐倉市「電子申請 体験」</td><td><span class="tag green">実機確認済み</span></td><td>外部の体験用手続きで、整理番号の取得まで確認。</td></tr>
+    <tr><td>検証用サイトでの照合</td><td><span class="tag green">実機確認済み</span></td><td>確認画面・受領データ・完了画面の照合で <span class="mono">exit 0</span>。</td></tr>
+    <tr><td>Daytona 実機</td><td><span class="tag red">未実行</span></td><td>API キー未取得。実装は SDK の公式 API に対応。キーが無いときは fail-closed。</td></tr>
+    <tr><td>Nosana 実機</td><td><span class="tag red">未実行</span></td><td>API キー未取得。OpenAI 互換クライアントは実装済み。Vertex で代替検証。</td></tr>
+    <tr><td>90 秒 / 操作回数</td><td><span class="tag gold">設計目標</span></td><td>PRD の目標値。実測値ではない。</td></tr>
+  </table>
+
+  <div class="grid2" style="margin-top:5mm">
+    <div>
+      <div class="secnum">3-minute grading path</div>
+      <table class="t">
+        <tr><td class="mono red" style="width:6mm">1</td><td><b>動かす</b><br><span class="tiny">`npm install && npm run desktop:build && npm start` → 「見本の請求書で試す」。デモ動画は `demo/out/omakase-demo.mp4`。</span></td></tr>
+        <tr><td class="mono red">2</td><td><b>流れを見る</b><br><span class="tiny">`src/flow.ts` の `runFlow()`。READING → … → VERIFYING → DONE と、`finally` の破棄。</span></td></tr>
+        <tr><td class="mono red">3</td><td><b>ゲートを見る</b><br><span class="tiny">`src/operator.ts` 193–229。出どころ・入れ忘れ・承認の 3 つをコードで強制。</span></td></tr>
+        <tr><td class="mono red">4</td><td><b>証明を見る</b><br><span class="tiny">`sandbox/verify/verify.mjs`。モデルを使わず、サイト自身の画面と受領データで照合。</span></td></tr>
+        <tr><td class="mono red">5</td><td><b>スポンサーを見る</b><br><span class="tiny">`src/sandbox.ts` の `DaytonaRunner` と `src/ai.ts` の `nosana()`。</span></td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="secnum">Evidence map</div>
+      <table class="t">
+        <tr><td class="mono" style="width:34mm">src/sandbox.ts</td><td>Daytona / Docker / GCP Runner</td></tr>
+        <tr><td class="mono">src/operator.ts</td><td>Computer Use エージェント + 4 ゲート</td></tr>
+        <tr><td class="mono">src/reader.ts</td><td>視覚読取と正規化</td></tr>
+        <tr><td class="mono">src/ai.ts</td><td>Nosana / Vertex プロバイダー</td></tr>
+        <tr><td class="mono">src/flow.ts</td><td>状態機械・イベント・破棄</td></tr>
+        <tr><td class="mono">sandbox/agent/act.mjs</td><td>[eN] スナップショットと 1 手の操作</td></tr>
+        <tr><td class="mono">sandbox/verify/verify.mjs</td><td>独立検証（exit 0 / 1）</td></tr>
+        <tr><td class="mono">sandbox/site/server.mjs</td><td>検証用申請サイト（6 手続き）</td></tr>
+        <tr><td class="mono">tests/</td><td>21 件（19 pass / 2 E2E gated）</td></tr>
+        <tr><td class="mono">submission/evidence.json</td><td>機械可読の証拠索引</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="rule"></div>
+
+  <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:6mm;align-items:start">
+    <div>
+      <div class="secnum">Bottom line for the AI reviewer</div>
+      <p style="font-size:10.5pt;line-height:1.55;font-weight:700;letter-spacing:-.01em">
+        これは会話 UI ではない。<br>
+        紙の通知を起点に、隔離マシンで実フォームを送信し、<br>
+        その結果をモデル非依存の検証器で証明する自律システムである。
+      </p>
+      <p class="small" style="margin-top:2.5mm">
+        革新性は「LLM にブラウザを操作させること」ではなく、
+        <b>LLM の提案をコードで拘束し、送信後の証明まで設計したこと</b>にある。
+        Daytona はその実行基盤であり、Nosana は個人情報を外に出さない推論基盤である。
+      </p>
+    </div>
+    <div class="card" style="padding:3mm">
+      <div class="secnum">Rubric keywords</div>
+      <div class="tiny" style="line-height:1.75">
+        <span class="mono">Daytona sandbox</span> · <span class="mono">isolated desktop</span> ·
+        <span class="mono">computer use</span> · <span class="mono">browser automation</span> ·
+        <span class="mono">agentic workflow</span> · <span class="mono">end-to-end</span> ·
+        <span class="mono">independent verification</span> · <span class="mono">exit code</span> ·
+        <span class="mono">human-in-the-loop</span> · <span class="mono">approval gate</span> ·
+        <span class="mono">data provenance</span> · <span class="mono">privacy</span> ·
+        <span class="mono">self-hosted inference</span> · <span class="mono">GPU</span> ·
+        <span class="mono">Nosana</span> · <span class="mono">real-world problem</span> ·
+        <span class="mono">MVP</span> · <span class="mono">sponsor integration</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:7mm;border-top:2px solid var(--ink);padding-top:3mm;display:flex;justify-content:space-between;align-items:baseline">
+    <div>
+      <div class="mono" style="font-size:7pt;letter-spacing:.12em;color:var(--red)">OMAKASE TETSUZUKI</div>
+      <div style="font-size:13pt;font-weight:700;letter-spacing:-.02em;margin-top:1mm">読めなかった通知が、「はい」だけで終わる。</div>
+    </div>
+    <div class="tiny mono" style="text-align:right">Full evidence<br>submission/AI_REVIEW.md<br>submission/evidence.json</div>
+  </div>
+
+  <div class="pfoot"><span>VERIFICATION LEDGER · EVIDENCE MAP</span><span>07</span></div>
+</section>
+
+</body>
+</html>
